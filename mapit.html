@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///C:/Users/Inventator1/Desktop/html.%20mappit/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>mapit</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      min-height: 100vh;
+    }
+    #welcomeBar {
+      width: 100%;
+      background: #333;
+      color: white;
+      display: grid !important;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      column-gap: 0;
+      padding: 0 32px;
+      min-height: 80px;
+    }
+    #welcomeCenter { display:flex; align-items:center; gap:6px; }
+    #tutorialBtn { background:#555; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; transition: background 0.2s; }
+    #tutorialBtn:hover { background:#777; }
+    #commandBar { 
+      background:#fff; 
+      color:#333; 
+      border:2px solid #ddd; 
+      border-radius:8px; 
+      padding:10px 16px; 
+      font-size:14px;
+      width:300px;
+      transition: border-color 0.2s;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2001;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: none; /* Hidden by default, shown only in canvas area */
+    }
+    #commandBar:focus { 
+      outline:none; 
+      border-color:#4285F4; 
+    }
+    #commandBar::placeholder { 
+      color:#999; 
+    }
+    #welcomeRightSpacer { width: 120px; height: 1px; }
+    #welcomeBanner {
+      flex: 1;
+      text-align: center;
+      font-size: 2.2em;
+      letter-spacing: 1px;
+    }
+    #welcomeButtons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0 30px 0;
+    }
+    #welcomeButtons button {
+      padding: 12px 32px;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: none;
+      background: #555;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #welcomeButtons button:hover {
+      background: #777;
+    }
+    #recentFilesGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 260px;      /* Adjusted height for smaller file info */
+      gap: 24px;
+      width: 100vw;
+      max-width: 100vw;
+      margin: 0 0 32px 0;
+      padding: 0 0 0 0;
+      box-sizing: border-box;
+    }
+    .fileBox, .addBox {
+      width: 100%;
+      height: 200px;          /* Fixed height for the image area */
+      background: #fff;
+      border: 2px solid #bbb;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 2px 8px #0001;
+      transition: all 0.2s ease;
+      margin: 0;              /* Remove any margin */
+    }
+    
+    .fileContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+    
+    .fileInfo {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      width: 90%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .fileName {
+      font-size: 12px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      min-width: 70px;
+      transition: all 0.2s ease;
+    }
+    
+    .fileDate {
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      min-width: 70px;
+      transition: all 0.2s ease;
+    }
+    
+    .fileStage {
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      min-width: 70px;
+      transition: all 0.2s ease;
+    }
+    
+    .fileStage:hover {
+      background: #e8f4f8;
+      border-color: #4285F4;
+    }
+    
+    .fileStage.blank {
+      background: #f0f0f0;
+      color: #999;
+    }
+    
+    .fileStage.started {
+      background: #fff3cd;
+      color: #856404;
+      border-color: #ffeaa7;
+    }
+    
+    .fileStage.done {
+      background: #d4edda;
+      color: #155724;
+      border-color: #c3e6cb;
+    }
+    
+
+    .fileBox:hover, .addBox:hover {
+      border: 2px solid #333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px #0002;
+    }
+    
+    .fileContainer:hover .fileName,
+    .fileContainer:hover .fileDate,
+    .fileContainer:hover .fileStage {
+      background: #f0f0f0;
+      border-color: #ccc;
+    }
+    .fileBox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .addBox {
+      font-size: 3em;
+      color: #888;
+      background: #f8f8f8;
+      justify-content: center;
+      align-items: center;
+      height: 200px;          /* Match fileBox height */
+    }
+    #menu {
+      width: 100%;
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      position: relative;
+      display: none;
+    }
+    #menu button {
+      background: #555;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    #menu button:hover {
+      background: #777;
+    }
+    #canvas {
+      border: 2px solid #333;
+      background: white;
+      cursor: crosshair;
+      margin-top: 10px;
+      display: none;
+    }
+    #menuBtn {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      z-index: 2002;
+      width: 60px;
+      height: 60px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: none; /* Hidden by default, shown after welcome */
+      transition: background 0.2s;
+      padding: 0;
+      justify-content: center;
+      align-items: center;
+    }
+    #menuBtn:hover {
+      background: #555;
+    }
+    .menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 32px;
+      height: 32px;
+      gap: 6px;
+    }
+    .menu-icon span {
+      display: block;
+      width: 32px;
+      height: 5px;
+      background: white;
+      border-radius: 3px;
+    }
+    #sideMenu {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 260px;
+      height: 100vh;
+      background: #222;
+      box-shadow: 2px 0 16px #0004;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-top: 80px;
+      z-index: 2001;
+      transition: left 0.3s;
+    }
+    #sideMenu.open {
+      left: 0;
+    }
+    #sideMenu button {
+      margin: 20px 30px;
+      padding: 18px 0;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 8px;
+      background: #444;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: calc(100% - 60px); /* full width minus margin */
+      text-align: center;
+      display: block;
+    }
+    #sideMenu button:hover {
+      background: #666;
+    }
+
+    /* Account modal styles */
+    #accountModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+    }
+    #accountModal > div {
+      background: #fff;
+      padding: 32px 24px;
+      border-radius: 12px;
+      min-width: 320px;
+      box-shadow: 0 4px 24px #0004;
+      position: relative;
+    }
+    #closeAccountModal {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+    #accountModalTitle {
+      margin: 0 0 16px 0;
+      font-size: 1.8em;
+      text-align: center;
+    }
+    #loginForm, #registerForm {
+      display: block;
+      margin: 0;
+    }
+    #loginForm input, #registerForm input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #loginForm button, #registerForm button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 4px;
+      background: #4285F4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #loginForm button:hover, #registerForm button:hover {
+      background: #357ae8;
+    }
+    #showRegisterBtn {
+      background: none;
+      border: none;
+      color: #4285F4;
+      cursor: pointer;
+      padding: 0;
+      font-size: 1em;
+    }
+    #accountError {
+      color: red;
+      text-align: center;
+      margin-top: 8px;
+    }
+    /* Circular progress bar styles */
+    .circular-progress {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 10px auto;
+    }
+    .circular-progress svg {
+      transform: rotate(-90deg);
+    }
+    .circular-progress .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    /* Settings layout */
+    #settingsModal .container { display: flex; gap: 16px; align-items: stretch; height: 100%; }
+    #settingsModal .sidebar { width: 260px; background: #f5f5f5; padding: 16px; overflow:auto; border-right: 1px solid #e5e5e5; }
+    #settingsModal .sidebar button { width: 100%; padding: 10px 12px; margin: 8px 0; background: #444; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    #settingsModal .sidebar button:hover { background: #666; }
+    #settingsModal .content { flex: 1; padding: 24px; overflow:auto; }
+    #settingsModal .card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 24px; height: calc(100% - 24px); }
+
+    /* Avatar crop modal */
+    #avatarCropModal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:3500; align-items:center; justify-content:center; }
+    #avatarCropModal .dialog { background:#fff; padding:16px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.2); max-width:90vw; }
+    #avatarCropCanvas { display:block; width:400px; height:400px; background:#111; border-radius:12px; }
+    #avatarCropModal .actions { display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
+    #avatarCropModal button { background:#444; color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; }
+    #avatarCropModal button.primary { background:#4285F4; }
+  </style>
+<style type="text/css" id="operaUserStyle"></style></head>
+<body>
+  <span id="userInfo" style="display:none; margin: 10px auto; text-align:center;"></span>
+
+  <input type="text" id="commandBar" placeholder="Search tools or type / for commands...">
+  <div id="welcomeBar" style="width: 100%; background: rgb(51, 51, 51); color: white; display: flex; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 0px; padding: 0px 32px; min-height: 80px;">
+    <div></div>
+    <div id="welcomeCenter" style="gap: 73px;">
+      <div id="welcomeBanner" style="text-align: center; font-size: 2.2em; letter-spacing: 1px; display: none;">Welcome Back! Glad to see you again. Continue your creative work!</div>
+    </div>
+    <div></div>
+  </div>
+  <div id="welcomeButtons" style="display: none;">
+    <button id="welcomeNewBtn">New File</button>
+    <button id="welcomeOpenBtn">Open File</button>
+  </div>
+  <div id="recentFilesGrid" style="display: none;"><div class="fileContainer"><div class="fileBox" title="Open blank project" style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgb(248, 248, 248); color: rgb(102, 102, 102); font-size: 14px; font-weight: bold;">Project 2</div><div class="fileInfo"><div class="fileDate">9/1/2025</div><div class="fileStage blank">blank</div><div class="fileName">Project 2</div></div></div><div class="fileContainer"><div class="fileBox" title="Open blank project" style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgb(248, 248, 248); color: rgb(102, 102, 102); font-size: 14px; font-weight: bold;">New Project</div><div class="fileInfo"><div class="fileDate">8/14/2025</div><div class="fileStage blank">blank</div><div class="fileName">New Project</div></div></div><div class="fileContainer"><div class="addBox" title="Create new file">+</div></div></div>
+
+  <div id="menu" style="display: none;">
+    <button id="newFileBtn">New File</button>
+    <button id="openFileBtn">Open File</button>
+    <button id="saveFileBtn">Save</button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+  </div>
+
+  <canvas id="canvas" width="800" height="600" style="display: block;"></canvas>
+
+  <!-- Layer switcher (fixed) -->
+  <div id="layerSwitcher" style="position:fixed; top:96px; left:24px; z-index:1999; display:none; flex-direction:column; gap:10px;">
+    <button id="layerSketchBtn" title="Sketch layer" style="width:48px; height:48px; border-radius:8px; border:2px solid #444; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px #0002;">✏️</button>
+    <button id="layerIslandBtn" title="Island layer" style="width:48px; height:48px; border-radius:8px; border:2px solid #444; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px #0002;">◯</button>
+  </div>
+
+  <!-- Tools sidebar (fixed, shared across layers) -->
+  <div id="toolsSidebar" style="position:fixed; top:0; right:0; z-index:2100; width:320px; height:100vh; background:#ffffff; border-left:1px solid #ddd; padding:12px; display:none; box-shadow:-4px 0 12px #0000000f; overflow:auto; border-radius:0;">
+    <div id="toolsHeader" style="font-weight:bold; margin-bottom:8px;">Tools</div>
+    
+    <!-- Tool Section -->
+    <div id="toolSection" style="margin-bottom:16px;">
+      <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Tool Section</div>
+      <div id="toolsGrid" style="display:grid; grid-template-columns:repeat(3, 56px); gap:8px; align-content:start; justify-content:start; margin-bottom:12px;"></div>
+    </div>
+    
+    <!-- Color Chooser Section -->
+    <div id="sketchLayerSection" style="margin-bottom:16px; display:none;">
+      <div class="section-header" style="font-weight:bold; margin-bottom:12px; color:#333; font-size:14px;">Pen Color</div>
+      <div id="sketchSettings" style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+        <!-- Current Color Preview -->
+        <div id="currentColorPreview" style="width:50px; height:50px; border-radius:50%; border:3px solid #4285F4; background:#000000; box-shadow:0 2px 8px rgba(0,0,0,0.2); margin-bottom:8px;"></div>
+        
+        <!-- Advanced Color Picker -->
+        <div id="advancedColorPicker" style="position:relative; width:170px; height:170px; margin:8px 0;">
+          <!-- Hue Wheel -->
+          <canvas id="hueWheel" width="170" height="170" style="position:absolute; top:0; left:0; border-radius:50%; cursor:pointer;"></canvas>
+          
+          <!-- Saturation/Lightness Square -->
+          <div id="saturationSquare" style="position:absolute; top:30px; left:30px; width:110px; height:110px; border-radius:6px; cursor:pointer; overflow:hidden;">
+            <canvas id="saturationCanvas" width="110" height="110" style="width:100%; height:100%;"></canvas>
+          </div>
+          
+          <!-- Hue Selector -->
+          <div id="hueSelector" style="position:absolute; width:12px; height:12px; border:2px solid white; border-radius:50%; pointer-events:none; box-shadow:0 0 4px rgba(0,0,0,0.8); z-index:10; top:5px; left:80px; background:rgba(0,0,0,0.3);"></div>
+          
+          <!-- Saturation/Lightness Selector -->
+          <div id="slSelector" style="position:absolute; width:12px; height:12px; border:2px solid white; border-radius:50%; pointer-events:none; box-shadow:0 0 4px rgba(0,0,0,0.8); z-index:10; top:64px; left:85px; background:rgba(0,0,0,0.3);"></div>
+        </div>
+        
+        <!-- Color Value Display -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <div id="colorValue" style="font-size:12px; color:#666; font-family:monospace;">#000000</div>
+          <input type="color" id="customColorPicker" value="#000000" style="width:40px; height:40px; border:2px solid #ddd; border-radius:50%; cursor:pointer; opacity:0; position:absolute; pointer-events:none;">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sketch Setting Section -->
+    <div id="sketchSettingSection" style="margin-bottom:16px; display:none;">
+      <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Sketch Setting</div>
+      <div id="sketchSettingsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+    
+    <!-- Grid Setting Section -->
+    <div id="gridSettingSection" style="margin-bottom:16px;">
+      <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Grid Setting</div>
+      <div id="gridSettings" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+    
+
+    
+    <!-- Island Setting Section -->
+    <div id="islandSettingSection" style="margin-bottom:16px; display:none;">
+      <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Island Setting</div>
+      <div id="islandSettingsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+    
+    <!-- Additional Tools List -->
+    <div id="toolsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+
+  <div id="accountModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:3000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 24px;border-radius:12px;min-width:320px;box-shadow:0 4px 24px #0004;position:relative;">
+      <button id="closeAccountModal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5em;cursor:pointer;">×</button>
+      <h2 id="accountModalTitle">Login</h2>
+      <form id="loginForm">
+        <input type="text" id="loginFirstName" placeholder="First Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        <input type="text" id="loginLastName" placeholder="Last Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        <input type="password" id="loginPassword" placeholder="Password" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;">Login</button>
+      </form>
+      <div style="text-align:center;">
+        <span>Don't have an account?</span>
+        <button id="showRegisterBtn" style="background:none;border:none;color:#4285F4;cursor:pointer;">Create one</button>
+      </div>
+      <form id="registerForm" style="display:none;margin-top:16px;">
+        <input type="text" id="registerFirstName" placeholder="First Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        <input type="text" id="registerLastName" placeholder="Last Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        <input type="password" id="registerPassword" placeholder="Password" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+        
+        <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Objective:</label>
+        <select id="registerObjective" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
+          <option value="">Select your objective</option>
+          <option value="gaming-maps">Gaming Maps</option>
+          <option value="personal-reasons">Personal Reasons</option>
+          <option value="educational">Educational Purposes</option>
+          <option value="business">Business Planning</option>
+          <option value="travel">Travel Planning</option>
+          <option value="research">Research &amp; Analysis</option>
+          <option value="creative">Creative Projects</option>
+          <option value="other">Other</option>
+        </select>
+        
+        <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Preferred Map Type:</label>
+        <select id="registerMapType" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
+          <option value="">Select your preferred map type</option>
+          <option value="physical-maps">Physical Maps</option>
+          <option value="general-maps">General Maps</option>
+          <option value="celestial-maps">Celestial Maps</option>
+        </select>
+        
+        <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;">Create Account</button>
+      </form>
+      <div id="accountError" style="color:red;text-align:center;margin-top:8px;"></div>
+    </div>
+  </div>
+  <button id="customLoginBtn" style="position: fixed; top: 20px; right: 32px; z-index: 1100; padding: 10px 24px; border-radius: 8px; background: rgb(85, 85, 85); color: white; border: none; cursor: pointer; display: none;">Login</button>
+  <button id="settingsBtn" style="position: fixed; top: 20px; right: 140px; z-index: 1100; padding: 10px 24px; border-radius: 8px; background: rgb(85, 85, 85); color: white; border: none; cursor: pointer; display: none;">Settings</button>
+  <img id="userAvatar" alt="User" style="position:fixed;top:20px;right:32px;z-index:1100;width:48px;height:48px;border-radius:50%;border:2px solid #ddd;background:#fff;object-fit:cover;display:none;cursor:pointer;">
+
+  <button id="menuBtn" title="Menu" style="position: fixed; top: 0px; left: 0px; z-index: 2002; width: 60px; height: 60px; background: rgb(51, 51, 51); color: white; border: none; border-radius: 0px 0px 12px; cursor: pointer; display: flex; transition: background 0.2s; justify-content: center; align-items: center;">
+    <span class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+  <div id="sideMenu">
+    <button id="sideNewFileBtn">New File</button>
+    <button id="sideOpenFileBtn">Open File</button>
+    <button id="sideSaveFileBtn">Save File</button>
+    <button id="sideTutorialBtn">Tutorial</button>
+    <button id="sideSettingsBtn">Settings</button>
+  </div>
+
+  <div id="settingsModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#ffffff;z-index:3000;align-items:stretch;justify-content:stretch;">
+    <div style="background:#fff;padding:0;border-radius:0;width:100%;height:100%;overflow:hidden;position:relative;box-shadow:none;">
+      <button id="closeSettingsModal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5em;cursor:pointer;">×</button>
+      <div class="container">
+        <div class="sidebar">
+          <button id="settingsCreateAccountTab">Create Account</button>
+          <button id="settingsEditProfileTab">Profile</button>
+          <button id="settingsShortcutsTab">Short cuts</button>
+          <button id="settingsToolUsageTab">Tool usage</button>
+        </div>
+        <div class="content">
+          <div id="settingsNotice" style="text-align:center;color:#d00;margin:0 0 12px 0;display:none;"></div>
+          <div class="card">
+            <form id="settingsCreateAccountForm" style="display:none;margin:0;">
+              <h3 style="margin-top:0">Create Account</h3>
+              <input type="text" id="settingsRegisterFirstName" placeholder="First Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+              <input type="text" id="settingsRegisterLastName" placeholder="Last Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+              <input type="password" id="settingsRegisterPassword" placeholder="Password" required="" style="width:100%;margin-bottom:10px;padding:8px;">
+              
+              <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Objective:</label>
+              <select id="settingsRegisterObjective" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">Select your objective</option>
+                <option value="gaming-maps">Gaming Maps</option>
+                <option value="personal-reasons">Personal Reasons</option>
+                <option value="educational">Educational Purposes</option>
+                <option value="business">Business Planning</option>
+                <option value="travel">Travel Planning</option>
+                <option value="research">Research &amp; Analysis</option>
+                <option value="creative">Creative Projects</option>
+                <option value="other">Other</option>
+              </select>
+              
+              <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Preferred Map Type:</label>
+              <select id="settingsRegisterMapType" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">Select your preferred map type</option>
+                <option value="physical-maps">Physical Maps</option>
+                <option value="general-maps">General Maps</option>
+                <option value="celestial-maps">Celestial Maps</option>
+              </select>
+              
+              <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;background:#4285F4;color:white;border:none;border-radius:4px;cursor:pointer;">Create Account</button>
+            </form>
+            <form id="settingsEditProfileForm" style="display:none;margin:0;">
+              <h3 style="margin-top:0">Profile</h3>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img id="profilePreview" alt="Profile" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:1px solid #ddd;display:none;">
+                <input type="file" id="profileImageInput" accept="image/*">
+              </div>
+              <input type="text" id="editFirstName" placeholder="First Name" style="width:100%;margin-bottom:10px;padding:8px;">
+              <input type="text" id="editLastName" placeholder="Last Name" style="width:100%;margin-bottom:10px;padding:8px;">
+              <input type="password" id="editNewPassword" placeholder="New Password (optional)" style="width:100%;margin-bottom:10px;padding:8px;">
+              <input type="password" id="editConfirmPassword" placeholder="Confirm New Password" style="width:100%;margin-bottom:10px;padding:8px;">
+              
+              <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Objective:</label>
+              <select id="editObjective" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">Select your objective</option>
+                <option value="gaming-maps">Gaming Maps</option>
+                <option value="personal-reasons">Personal Reasons</option>
+                <option value="educational">Educational Purposes</option>
+                <option value="business">Business Planning</option>
+                <option value="travel">Travel Planning</option>
+                <option value="research">Research &amp; Analysis</option>
+                <option value="creative">Creative Projects</option>
+                <option value="other">Other</option>
+              </select>
+              
+              <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Preferred Map Type:</label>
+              <select id="editMapType" style="width:100%;margin-bottom:10px;padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">Select your preferred map type</option>
+                <option value="physical-maps">Physical Maps</option>
+                <option value="general-maps">General Maps</option>
+                <option value="celestial-maps">Celestial Maps</option>
+              </select>
+              
+              <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;background:#4285F4;color:white;border:none;border-radius:4px;cursor:pointer;">Save Changes</button>
+            </form>
+            <div id="settingsShortcuts" style="display:none;margin:0;">
+              <h3 style="margin-top:0">Short cuts</h3>
+              <ul style="line-height:1.8; padding-left: 18px;">
+                <li><b>Hold Right Mouse</b>: Pan the canvas</li>
+                <li><b>Mouse Wheel</b>: Zoom in/out</li>
+                <li><b>Left Mouse</b>: Draw</li>
+                <li><b>Ctrl + S</b>: Save current drawing</li>
+                <li><b>Ctrl + O</b>: Open image</li>
+                <li><b>Ctrl + N</b>: New blank project</li>
+              </ul>
+            </div>
+            <div id="settingsToolUsage" style="display:none;margin:0;">
+              <h3 style="margin-top:0">Tool usage</h3>
+              <ol style="line-height:1.8; padding-left: 18px;">
+                <li>Use Left Mouse to draw strokes on the whiteboard.</li>
+                <li>Hold Right Mouse and drag to move around the canvas (pan).</li>
+                <li>Scroll the mouse wheel to zoom. Zoom centers under the cursor.</li>
+                <li>Click Save to store a snapshot into Recent Files.</li>
+                <li>Use Open to load an image as a background to annotate.</li>
+                <li>Manage your profile in the Profile tab to personalize your avatar.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Internet Connection Modal -->
+  <div id="noInternetModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:4000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:40px;border-radius:16px;text-align:center;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+      <h1 style="color:#d32f2f;font-size:3em;margin:0 0 20px 0;font-weight:bold;">NO INTERNET</h1>
+      <p style="font-size:1.2em;color:#333;margin:0 0 30px 0;line-height:1.5;">You do not have good internet. Please reconnect.</p>
+      <button id="reconnectBtn" style="background:#d32f2f;color:white;border:none;padding:15px 30px;font-size:1.1em;border-radius:8px;cursor:pointer;transition:background 0.3s;">Reconnect</button>
+    </div>
+  </div>
+
+  <!-- Avatar Crop Modal -->
+  <div id="avatarCropModal">
+    <div class="dialog">
+      <canvas id="avatarCropCanvas" width="400" height="400"></canvas>
+      <div class="actions">
+        <button id="avatarCropCancelBtn">Cancel</button>
+        <button id="avatarCropApplyBtn" class="primary">Crop &amp; Use</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // App bootstrap
+
+  // Internet connectivity detection
+  function checkInternetConnection() {
+    const noInternetModal = document.getElementById('noInternetModal');
+    const reconnectBtn = document.getElementById('reconnectBtn');
+    const modalTitle = noInternetModal.querySelector('h1');
+    const modalMessage = noInternetModal.querySelector('p');
+    const modalButton = noInternetModal.querySelector('button');
+    
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    function showNoInternetModal() {
+      noInternetModal.style.display = 'flex';
+    }
+    
+    function hideNoInternetModal() {
+      noInternetModal.style.display = 'none';
+      // Reset retry count when connection is restored
+      retryCount = 0;
+    }
+    
+    function updateModalContent(title, message, buttonText) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modalButton.textContent = buttonText;
+    }
+    
+    function showSuccessMessage() {
+      updateModalContent('SUCCESS!', 'Successful reconnection!', 'Continue');
+      modalTitle.style.color = '#4caf50';
+      modalButton.style.background = '#4caf50';
+      
+      // Hide modal after 3 seconds
+      setTimeout(() => {
+        hideNoInternetModal();
+        // Reset styling
+        modalTitle.style.color = '#d32f2f';
+        modalButton.style.background = '#d32f2f';
+      }, 3000);
+    }
+    
+    function checkConnection() {
+      if (!navigator.onLine) {
+        showNoInternetModal();
+        updateModalContent('NO INTERNET', 'You do not have good internet. Please reconnect.', 'Reconnect');
+      } else {
+        hideNoInternetModal();
+      }
+    }
+    
+    // Check initial connection
+    checkConnection();
+    
+    // Listen for online/offline events
+    window.addEventListener('online', function() {
+      showSuccessMessage();
+    });
+    window.addEventListener('offline', function() {
+      retryCount = 0;
+      showNoInternetModal();
+      updateModalContent('NO INTERNET', 'You do not have good internet. Please reconnect.', 'Reconnect');
+    });
+    
+    // Reconnect button functionality
+    reconnectBtn.addEventListener('click', function() {
+      if (navigator.onLine) {
+        showSuccessMessage();
+      } else {
+        retryCount++;
+        
+        if (retryCount <= maxRetries) {
+          // Show retry message
+          updateModalContent('NO INTERNET', `Connection failed. Try to reconnect again. (Attempt ${retryCount}/${maxRetries})`, 'Try Again');
+          
+          // Attempt to reconnect
+          setTimeout(() => {
+            if (navigator.onLine) {
+              showSuccessMessage();
+            } else if (retryCount >= maxRetries) {
+              // Show final message after max retries
+              updateModalContent('NO INTERNET', 'Try again later. Maximum retry attempts reached.', 'Try Again Later');
+              modalButton.disabled = true;
+              modalButton.style.background = '#999';
+            }
+          }, 2000); // Wait 2 seconds before checking if reconnection worked
+        } else {
+          // Show final message
+          updateModalContent('NO INTERNET', 'Try again later. Maximum retry attempts reached.', 'Try Again Later');
+          modalButton.disabled = true;
+          modalButton.style.background = '#999';
+        }
+      }
+    });
+    
+    // Additional check using fetch to test actual connectivity
+    function testConnection() {
+      fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
+        .then(() => {
+          if (!navigator.onLine) {
+            // If fetch succeeds but navigator.onLine is false, show success
+            showSuccessMessage();
+          }
+        })
+        .catch(() => {
+          if (navigator.onLine) {
+            // If fetch fails but navigator.onLine is true, show no internet
+            showNoInternetModal();
+            updateModalContent('NO INTERNET', 'You do not have good internet. Please reconnect.', 'Reconnect');
+          }
+        });
+    }
+    
+    // Test connection every 30 seconds
+    setInterval(testConnection, 30000);
+  }
+
+  window.onload = function() {
+    // Initialize internet connectivity detection
+    checkInternetConnection();
+  // --- Welcome Banner Logic ---
+  const welcomeBanner = document.getElementById('welcomeBanner');
+  const welcomeCenter = document.getElementById('welcomeCenter');
+  const commandBar = document.getElementById('commandBar');
+  const welcomeNewBtn = document.getElementById('welcomeNewBtn');
+  const welcomeOpenBtn = document.getElementById('welcomeOpenBtn');
+  const welcomeButtons = document.getElementById('welcomeButtons');
+  const recentFilesGrid = document.getElementById('recentFilesGrid');
+  const menu = document.getElementById('menu');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const fileInput = document.getElementById('fileInput');
+
+  let drawingEnabled = false;
+  let files = JSON.parse(localStorage.getItem('recentFiles') || '[]'); // Array of {imgData, timestamp}
+  
+  // Migrate existing files to include fileName if missing
+  files.forEach((file, index) => {
+    if (!file.fileName) {
+      file.fileName = `Drawing ${index + 1}`;
+    }
+  });
+  let visited = localStorage.getItem('visited');
+  let currentFileIndex = null;
+
+  // Welcome message
+  if (!visited) {
+    welcomeBanner.textContent = "Welcome! This is your first time using the Map Drawing App. Enjoy!";
+    localStorage.setItem('visited', 'yes');
+  } else {
+    welcomeBanner.textContent = "Welcome Back! Glad to see you again. Continue your creative work!";
+  }
+  // Show welcome UI
+  welcomeBanner.style.display = 'block';
+  document.getElementById('welcomeBar').style.display = 'flex';
+  if (commandBar) commandBar.style.display = 'none'; // Hide command bar on welcome screen
+  welcomeButtons.style.display = 'flex';
+  recentFilesGrid.style.display = 'grid';
+  menu.style.display = 'none';
+  canvas.style.display = 'none';
+  if (document.getElementById('menuBtn')) document.getElementById('menuBtn').style.display = 'none';
+  document.getElementById('customLoginBtn').style.display = 'block'; // Show login button on welcome
+  // Reflect initial auth state (may switch to avatar)
+  try { updateAuthUI(); } catch (_) {}
+
+  // Render recent files grid
+  function renderRecentFiles() {
+    recentFilesGrid.innerHTML = '';
+    
+    // If no files exist, create a test file to show the layout
+    if (files.length === 0) {
+      const testFile = {
+        imgData: null, // No image data for blank files
+        timestamp: Date.now(),
+        fileName: 'New Project',
+        stage: 'blank'
+      };
+      files.push(testFile);
+    }
+    
+    for (let i = 0; i < Math.min(files.length, 9); i++) {
+      const container = document.createElement('div');
+      container.className = 'fileContainer';
+      
+      const box = document.createElement('div');
+      box.className = 'fileBox';
+      
+      if (files[i].imgData) {
+        // File has drawing data
+        const img = document.createElement('img');
+        img.src = files[i].imgData;
+        box.appendChild(img);
+        box.title = "Open drawing";
+      } else {
+        // Blank file - show stage info
+        box.style.display = 'flex';
+        box.style.flexDirection = 'column';
+        box.style.justifyContent = 'center';
+        box.style.alignItems = 'center';
+        box.style.background = '#f8f8f8';
+        box.style.color = '#666';
+        box.style.fontSize = '14px';
+        box.style.fontWeight = 'bold';
+        box.innerHTML = files[i].fileName || 'New Project';
+        box.title = "Open blank project";
+      }
+      
+      box.onclick = () => openRecentFile(i);
+      
+      const fileInfo = document.createElement('div');
+      fileInfo.className = 'fileInfo';
+      
+      const fileName = document.createElement('div');
+      fileName.className = 'fileName';
+      fileName.textContent = files[i].fileName || `Drawing ${i + 1}`;
+      
+      // Always show the date
+      const fileDate = document.createElement('div');
+      fileDate.className = 'fileDate';
+      const date = new Date(files[i].timestamp);
+      fileDate.textContent = date.toLocaleDateString();
+      fileInfo.appendChild(fileDate);
+      
+      // Show stage only for blank files (files without imgData)
+      if (!files[i].imgData) {
+        const fileStage = document.createElement('div');
+        fileStage.className = 'fileStage blank';
+        fileStage.textContent = 'blank';
+        // No click functionality - stage is fixed for blank files
+        fileInfo.appendChild(fileStage);
+      }
+      
+      fileInfo.appendChild(fileName);
+      
+      container.appendChild(box);
+      container.appendChild(fileInfo);
+      recentFilesGrid.appendChild(container);
+    }
+    // Add "+" box if less than 9 files
+    if (files.length < 9) {
+      const addContainer = document.createElement('div');
+      addContainer.className = 'fileContainer';
+      
+      const addBox = document.createElement('div');
+      addBox.className = 'addBox';
+      addBox.innerHTML = '+';
+      addBox.title = "Create new file";
+      addBox.onclick = () => startNewFile();
+      
+      addContainer.appendChild(addBox);
+      recentFilesGrid.appendChild(addContainer);
+    }
+  }
+
+  renderRecentFiles();
+  
+
+
+  // --- Welcome Buttons ---
+  welcomeNewBtn.onclick = () => startNewFile();
+  welcomeOpenBtn.onclick = () => fileInput.click();
+  
+  // Command bar functionality
+  const toolMap = {
+    'pen': 'pen',
+    'pencil': 'pen',
+    'draw': 'pen',
+    'eraser': 'eraser',
+    'erase': 'eraser',
+    'select': 'island-select',
+    'selection': 'island-select',
+    'move': 'island-move',
+    'scale': 'island-scale',
+    'resize': 'island-scale',
+    'island': 'island-dotted',
+    'dotted': 'island-dotted',
+    'dotted island': 'island-dotted'
+  };
+  
+  if (commandBar) {
+    commandBar.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const input = commandBar.value.trim().toLowerCase();
+        
+        if (input.startsWith('/')) {
+          // Handle commands starting with /
+          const command = input.substring(1).trim();
+          
+          if (command.includes('select') && command.includes('island')) {
+            // Switch to island layer and select tool
+            setActiveLayer('island');
+            activeTool = 'island-select';
+            updateCanvasCursor();
+            renderToolsSidebar();
+            redraw();
+            commandBar.value = '';
+          } else if (command.includes('edit') && command.includes('island')) {
+            // Switch to island layer and select tool for editing
+            setActiveLayer('island');
+            activeTool = 'island-select';
+            updateCanvasCursor();
+            renderToolsSidebar();
+            redraw();
+            commandBar.value = '';
+          } else {
+            // Unknown command - could show a message or do nothing
+            commandBar.value = '';
+          }
+        } else if (input.length > 0) {
+          // Search for tools
+          let foundTool = null;
+          
+          // Direct match first
+          if (toolMap[input]) {
+            foundTool = toolMap[input];
+          } else {
+            // Partial match
+            for (const [key, toolKey] of Object.entries(toolMap)) {
+              if (key.includes(input) || input.includes(key)) {
+                foundTool = toolKey;
+                break;
+              }
+            }
+          }
+          
+          if (foundTool) {
+            // Determine which layer the tool belongs to
+            if (foundTool === 'pen' || foundTool === 'eraser') {
+              setActiveLayer('sketch');
+            } else {
+              setActiveLayer('island');
+            }
+            
+            activeTool = foundTool;
+            updateCanvasCursor();
+            renderToolsSidebar();
+            redraw();
+            commandBar.value = '';
+          } else {
+            // Tool not found - clear input
+            commandBar.value = '';
+          }
+        }
+      }
+    });
+  }
+
+  // Keep tutorial button gap equal to the right gap from welcome message to Settings button
+  function syncTutorialGap() {
+    try {
+      const bannerRect = welcomeBanner.getBoundingClientRect();
+      const settingsRect = settingsBtn.getBoundingClientRect();
+      let gapRight = Math.round(settingsRect.left - bannerRect.right);
+      if (!isFinite(gapRight)) gapRight = 12;
+      const clamped = Math.max(6, Math.min(200, gapRight));
+      if (welcomeCenter) welcomeCenter.style.gap = clamped + 'px';
+    } catch (_) {}
+  }
+  // Initial and responsive
+  syncTutorialGap();
+  // Re-run after initial render settling
+  setTimeout(syncTutorialGap, 50);
+  setTimeout(syncTutorialGap, 200);
+  window.addEventListener('resize', syncTutorialGap);
+
+  // --- File actions ---
+  function startNewFile() {
+    // Create a new blank file
+    const newFile = {
+      imgData: null,
+      timestamp: Date.now(),
+      fileName: `Project ${files.length + 1}`,
+      stage: 'blank'
+    };
+    
+    files.unshift(newFile);
+    if (files.length > 9) files = files.slice(0, 9);
+    localStorage.setItem('recentFiles', JSON.stringify(files));
+    
+    showApp();
+    clearCanvas();
+    currentFileIndex = 0;
+    
+    renderRecentFiles();
+  }
+
+  function openRecentFile(idx) {
+    showApp();
+    clearCanvas();
+    
+    if (files[idx].imgData) {
+      // Load existing drawing
+      const img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = files[idx].imgData;
+    } else {
+      // Blank file - don't automatically change stage
+      // User must manually click the stage to progress
+    }
+    
+    currentFileIndex = idx;
+  }
+
+  // --- Show main app ---
+  function showApp() {
+    document.getElementById('welcomeBanner').style.display = 'none';
+    document.getElementById('welcomeButtons').style.display = 'none';
+    document.getElementById('recentFilesGrid').style.display = 'none';
+    document.getElementById('welcomeBar').style.display = 'none'; // Hide welcome bar in canvas area
+    // Show command bar when entering canvas/drawing area
+    if (commandBar) commandBar.style.display = 'block';
+    menu.style.display = 'none'; // Hide main menu since we have side menu
+    canvas.style.display = 'block';
+    drawingEnabled = true;
+    document.getElementById('menuBtn').style.display = 'flex';
+    document.getElementById('customLoginBtn').style.display = 'none'; // Hide login button in canvas area
+    document.getElementById('settingsBtn').style.display = 'none'; // Hide settings button in canvas area
+    const avatarEl = document.getElementById('userAvatar');
+    if (avatarEl) avatarEl.style.display = 'none'; // Hide avatar in canvas area
+    // Show layer switcher and tools sidebar when in app
+    const ls = document.getElementById('layerSwitcher');
+    const ts = document.getElementById('toolsSidebar');
+    if (ls) ls.style.display = 'flex';
+    if (ts) ts.style.display = 'block';
+    // Position sidebars just below the top black bar and stretch to bottom
+    const wb = document.getElementById('welcomeBar');
+    if (wb) {
+      const topPx = wb.getBoundingClientRect().bottom + 8;
+      if (ls) ls.style.top = topPx + 'px';
+      if (ts) {
+        ts.style.top = topPx + 'px';
+        ts.style.maxHeight = `calc(100vh - ${Math.round(topPx + 24)}px)`;
+      }
+    }
+  }
+
+  // --- Main menu buttons ---
+  const newFileBtn = document.getElementById('newFileBtn');
+  const openFileBtn = document.getElementById('openFileBtn');
+  const saveFileBtn = document.getElementById('saveFileBtn');
+
+  newFileBtn.onclick = () => {
+    if(confirm("Start a new project? This will clear the canvas.")) {
+      clearCanvas();
+      currentFileIndex = null;
+      alert("New project started!");
+    }
+  };
+
+  openFileBtn.onclick = () => {
+    fileInput.click();
+  };
+
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = function() {
+      clearCanvas();
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      currentFileIndex = null;
+    };
+    img.src = URL.createObjectURL(file);
+  };
+
+  saveFileBtn.onclick = () => {
+    // Save current canvas as a recent file
+    const imgData = canvas.toDataURL('image/png');
+    const fileName = `Drawing ${new Date().toLocaleDateString()}`;
+    if (currentFileIndex !== null) {
+      files[currentFileIndex].imgData = imgData;
+      files[currentFileIndex].timestamp = Date.now();
+      files[currentFileIndex].fileName = fileName;
+    } else {
+      files.unshift({imgData, timestamp: Date.now(), fileName: fileName});
+      if (files.length > 9) files = files.slice(0, 9);
+    }
+    localStorage.setItem('recentFiles', JSON.stringify(files));
+    alert("Drawing saved!");
+    renderRecentFiles();
+  };
+
+  // --- Infinite Whiteboard Drawing (pan/zoom + world coords) ---
+  // State
+  let isDrawing = false;
+  let isPanning = false;
+  let strokes = []; // Array of arrays of points in world coords: [{x,y}, ...]
+  let currentStroke = null;
+  let scale = 1;
+  const minScale = 0.2;
+  const maxScale = 6;
+  let offsetX = 0; // world-to-screen translation (in screen pixels)
+  let offsetY = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+
+  // Layers and tools
+  let activeLayer = 'sketch'; // 'sketch' | 'island'
+  let activeTool = 'pen';
+  let penColor = '#000000'; // Default black color for pen
+  let sketchLayerVisibility = 0; // 0–1 range (0 = hidden, 1 = fully visible)
+  let islands = []; // Array of closed islands (arrays of {x,y})
+  let isCreatingIsland = false;
+  let currentIslandPoints = [];
+  let isIslandDraggingDraw = false; // drawing continuous island points while mouse down
+  let selectedIslandIndex = -1;
+  let islandDragState = null; // { mode: 'move'|'scale', startWorld, originalPoints, centroid, startRadius }
+  let bboxTransformState = null; // For bounding box scaling with handles
+
+  // Grid state (10m squares)
+  let showGrid = true;
+  const gridSizeMeters = 10;
+  let lastGridSize = null;
+  let gridNotificationTimeout = null;
+
+  const layerSketchBtn = document.getElementById('layerSketchBtn');
+  const layerIslandBtn = document.getElementById('layerIslandBtn');
+  const toolsHeader = document.getElementById('toolsHeader');
+  const toolsList = document.getElementById('toolsList');
+  const toolsGrid = document.getElementById('toolsGrid');
+
+  function setActiveLayer(layer) {
+    activeLayer = layer;
+    if (layerSketchBtn) layerSketchBtn.style.borderColor = (layer === 'sketch') ? '#4285F4' : '#444';
+    if (layerIslandBtn) layerIslandBtn.style.borderColor = (layer === 'island') ? '#4285F4' : '#444';
+    if (layer === 'sketch') {
+      activeTool = 'pen';
+    } else if (layer === 'island') {
+      activeTool = 'island-dotted';
+    }
+    updateCanvasCursor();
+    renderToolsSidebar();
+    redraw();
+  }
+
+  function createToolButton(label, key) {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.style.padding = '8px 10px';
+    btn.style.border = '1px solid ' + (activeTool === key ? '#4285F4' : '#ccc');
+    btn.style.background = activeTool === key ? '#eaf2ff' : '#fff';
+    btn.style.borderRadius = '8px';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => {
+      activeTool = key;
+
+      if (key === 'toggle-grid') {
+        showGrid = !showGrid;
+      }
+      renderToolsSidebar();
+      redraw();
+    };
+    return btn;
+  }
+
+  function createSquareToolButton(label, key, title) {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    if (title) btn.title = title;
+    btn.style.width = '56px';
+    btn.style.height = '56px';
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.border = (activeTool === key ? '2px solid #4285F4' : '1px solid #ccc');
+    btn.style.background = activeTool === key ? '#eaf2ff' : '#fff';
+    btn.style.borderRadius = '6px';
+    btn.style.cursor = 'pointer';
+    btn.style.userSelect = 'none';
+    btn.onclick = () => {
+      activeTool = key;
+      updateCanvasCursor();
+      renderToolsSidebar();
+      redraw();
+    };
+    return btn;
+  }
+
+  function renderToolsSidebar() {
+    if (!toolsHeader) return;
+    toolsHeader.textContent = `Tools · ${activeLayer === 'sketch' ? 'Sketch' : 'Island'}`;
+    
+    // Clear all sections
+    const toolSection = document.getElementById('toolSection');
+    const sketchLayerSection = document.getElementById('sketchLayerSection');
+    const sketchSettingSection = document.getElementById('sketchSettingSection');
+    const gridSettingSection = document.getElementById('gridSettingSection');
+    const islandLayerSection = document.getElementById('islandLayerSection');
+    const islandSettingSection = document.getElementById('islandSettingSection');
+    const toolsList = document.getElementById('toolsList');
+    
+    // Clear all content (but preserve color picker structure)
+    if (document.getElementById('toolsGrid')) document.getElementById('toolsGrid').innerHTML = '';
+    if (document.getElementById('sketchSettingsList')) document.getElementById('sketchSettingsList').innerHTML = '';
+    if (document.getElementById('gridSettings')) document.getElementById('gridSettings').innerHTML = '';
+    if (document.getElementById('islandSettings')) document.getElementById('islandSettings').innerHTML = '';
+    if (document.getElementById('islandSettingsList')) document.getElementById('islandSettingsList').innerHTML = '';
+    if (toolsList) toolsList.innerHTML = '';
+    
+    // Show/hide sections based on active layer
+    if (activeLayer === 'sketch') {
+      if (sketchLayerSection) sketchLayerSection.style.display = 'block';
+      if (sketchSettingSection) sketchSettingSection.style.display = 'block';
+      if (islandLayerSection) islandLayerSection.style.display = 'none';
+      if (islandSettingSection) islandSettingSection.style.display = 'none';
+    } else if (activeLayer === 'island') {
+      if (sketchLayerSection) sketchLayerSection.style.display = 'none';
+      if (sketchSettingSection) sketchSettingSection.style.display = 'none';
+      if (islandLayerSection) islandLayerSection.style.display = 'block';
+      if (islandSettingSection) islandSettingSection.style.display = 'block';
+    }
+    
+    // Tool Section - always visible for both layers
+    const toolsGrid = document.getElementById('toolsGrid');
+    if (toolsGrid) {
+      if (activeLayer === 'sketch') {
+        toolsGrid.appendChild(createSquareToolButton('✏️', 'pen', 'Pen'));
+        toolsGrid.appendChild(createSquareToolButton('🧽', 'eraser', 'Eraser'));
+      } else if (activeLayer === 'island') {
+        toolsGrid.appendChild(createSquareToolButton('⚬', 'island-dotted', 'Dotted Island Tool'));
+        toolsGrid.appendChild(createSquareToolButton('✋', 'island-select', 'Select'));
+        toolsGrid.appendChild(createSquareToolButton('↔️', 'island-move', 'Move'));
+        toolsGrid.appendChild(createSquareToolButton('🔍', 'island-scale', 'Scale'));
+      }
+    }
+    
+    // Grid Setting Section - always visible
+    const gridSettings = document.getElementById('gridSettings');
+    if (gridSettings) {
+      gridSettings.appendChild(createToolButton(showGrid ? 'Hide Grid (10m)' : 'Show Grid (10m)', 'toggle-grid'));
+    }
+    
+    if (activeLayer === 'sketch') {
+      // Color Chooser Section
+      const customColorPicker = document.getElementById('customColorPicker');
+      const currentColorPreview = document.getElementById('currentColorPreview');
+      const colorValue = document.getElementById('colorValue');
+      
+      // Update color preview
+      if (currentColorPreview) {
+        currentColorPreview.style.background = penColor;
+      }
+      
+      if (colorValue) {
+        colorValue.textContent = penColor;
+      }
+      
+      // Initialize advanced color picker
+      setTimeout(() => {
+        initializeAdvancedColorPicker();
+      }, 100);
+      
+      if (customColorPicker) {
+        customColorPicker.value = penColor;
+        customColorPicker.onchange = (e) => {
+          penColor = e.target.value;
+          if (currentColorPreview) currentColorPreview.style.background = penColor;
+          if (colorValue) colorValue.textContent = penColor;
+          updateAdvancedColorPicker();
+          renderToolsSidebar();
+        };
+      }
+      
+      // Sketch Setting Section
+      const sketchSettingsList = document.getElementById('sketchSettingsList');
+      if (sketchSettingsList) {
+        // Add sketch visibility controls (always visible)
+          // Circular transparency slider
+          const sliderContainer = document.createElement('div');
+          sliderContainer.style.display = 'flex';
+          sliderContainer.style.flexDirection = 'column';
+          sliderContainer.style.alignItems = 'center';
+          sliderContainer.style.gap = '8px';
+          sliderContainer.style.marginBottom = '8px';
+          
+          const sliderLabel = document.createElement('label');
+          sliderLabel.textContent = 'Sketch Transparency:';
+          sliderLabel.style.fontSize = '12px';
+          sliderLabel.style.color = '#333';
+          sliderLabel.style.textAlign = 'center';
+          
+          // Straight slider container
+          const sliderContainer2 = document.createElement('div');
+          sliderContainer2.style.position = 'relative';
+          sliderContainer2.style.width = '120px';
+          sliderContainer2.style.height = '20px';
+          sliderContainer2.style.margin = '8px 0';
+          
+          // Background bar
+          const bgBar = document.createElement('div');
+          bgBar.style.width = '100%';
+          bgBar.style.height = '4px';
+          bgBar.style.background = '#e0e0e0';
+          bgBar.style.borderRadius = '2px';
+          bgBar.style.position = 'absolute';
+          bgBar.style.top = '8px';
+          
+          // Progress bar
+          const progressBar = document.createElement('div');
+          progressBar.style.width = (sketchLayerVisibility * 100) + '%';
+          progressBar.style.height = '4px';
+          progressBar.style.background = '#4285F4';
+          progressBar.style.borderRadius = '2px';
+          progressBar.style.position = 'absolute';
+          progressBar.style.top = '8px';
+          progressBar.id = 'straightProgressBar';
+          
+          // Knob (draggable circle)
+          const knob = document.createElement('div');
+          knob.style.width = '16px';
+          knob.style.height = '16px';
+          knob.style.background = '#4285F4';
+          knob.style.border = '2px solid #fff';
+          knob.style.borderRadius = '50%';
+          knob.style.position = 'absolute';
+          knob.style.left = (sketchLayerVisibility * 104) + 'px';
+          knob.style.top = '2px';
+          knob.style.cursor = 'pointer';
+          knob.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+          knob.id = 'straightSliderKnob';
+          
+          sliderContainer2.appendChild(bgBar);
+          sliderContainer2.appendChild(progressBar);
+          sliderContainer2.appendChild(knob);
+          
+          // Value display in center
+          const valueDisplay = document.createElement('div');
+          valueDisplay.textContent = Math.round(sketchLayerVisibility * 100) + '%';
+          valueDisplay.style.position = 'absolute';
+          valueDisplay.style.top = '50%';
+          valueDisplay.style.left = '50%';
+          valueDisplay.style.transform = 'translate(-50%, -50%)';
+          valueDisplay.style.fontSize = '12px';
+          valueDisplay.style.fontWeight = 'bold';
+          valueDisplay.style.color = '#333';
+          valueDisplay.style.pointerEvents = 'none';
+          valueDisplay.id = 'circularSliderValue';
+          
+          sliderContainer2.appendChild(valueDisplay);
+          
+          sliderContainer.appendChild(sliderLabel);
+          sliderContainer.appendChild(sliderContainer2);
+          
+          // Hide checkbox
+          const checkboxContainer = document.createElement('div');
+          checkboxContainer.style.display = 'flex';
+          checkboxContainer.style.alignItems = 'center';
+          checkboxContainer.style.gap = '8px';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = 'hideSketchLayerCheckbox';
+          checkbox.checked = sketchLayerVisibility === 0;
+          
+          const checkboxLabel = document.createElement('label');
+          checkboxLabel.textContent = 'Hide Sketch Layer';
+          checkboxLabel.style.fontSize = '12px';
+          checkboxLabel.style.color = '#333';
+          checkboxLabel.style.cursor = 'pointer';
+          
+          checkboxContainer.appendChild(checkbox);
+          checkboxContainer.appendChild(checkboxLabel);
+          
+          // Circular slider interaction
+          let isDraggingCircular = false;
+          
+          function updateStraightSlider(value) {
+            const progressBar = document.getElementById('straightProgressBar');
+            const knob = document.getElementById('straightSliderKnob');
+            const valueDisplay = document.getElementById('circularSliderValue');
+            
+            if (progressBar && knob && valueDisplay) {
+              progressBar.style.width = (value * 100) + '%';
+              knob.style.left = (value * 104) + 'px';
+              valueDisplay.textContent = Math.round(value * 100) + '%';
+            }
+          }
+          
+          function getValueFromMouse(e, container) {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            return Math.max(0, Math.min(1, x / rect.width));
+          }
+          
+          knob.addEventListener('mousedown', function(e) {
+            isDraggingCircular = true;
+            e.stopPropagation();
+          });
+          
+          document.addEventListener('mousemove', function(e) {
+            if (!isDraggingCircular) return;
+            const value = getValueFromMouse(e, sliderContainer2);
+            sketchLayerVisibility = value;
+            updateStraightSlider(value);
+            
+            if (value > 0) {
+              checkbox.checked = false;
+            }
+            
+            redraw();
+          });
+          
+          document.addEventListener('mouseup', function() {
+            isDraggingCircular = false;
+          });
+          
+          checkbox.addEventListener('change', function() {
+            if (this.checked) {
+              sketchLayerVisibility = 0;
+              updateStraightSlider(0);
+              knob.style.opacity = '0.5';
+              knob.style.pointerEvents = 'none';
+            } else {
+              knob.style.opacity = '1';
+              knob.style.pointerEvents = 'auto';
+            }
+            redraw();
+          });
+          
+          // Update slider state based on checkbox
+          if (checkbox.checked) {
+            knob.style.opacity = '0.5';
+            knob.style.pointerEvents = 'none';
+          }
+          
+          sketchSettingsList.appendChild(sliderContainer);
+          
+          // Add note when on sketch layer
+          if (activeLayer === 'sketch') {
+            const note = document.createElement('div');
+            note.textContent = '(Applies when on Island layer)';
+            note.style.fontSize = '10px';
+            note.style.color = '#666';
+            note.style.fontStyle = 'italic';
+            note.style.marginBottom = '8px';
+            sketchSettingsList.appendChild(note);
+          }
+          
+          sketchSettingsList.appendChild(checkboxContainer);
+      }
+    } else if (activeLayer === 'island') {
+
+      
+      // Island Setting Section
+      const islandSettingsList = document.getElementById('islandSettingsList');
+      if (islandSettingsList) {
+        // Management tools
+        islandSettingsList.appendChild(createToolButton('Select', 'island-select'));
+        islandSettingsList.appendChild(createToolButton('Move', 'island-move'));
+        islandSettingsList.appendChild(createToolButton('Scale', 'island-scale'));
+      }
+      
+      // Island list in additional tools
+      if (toolsList) {
+        const listHeader = document.createElement('div');
+        listHeader.textContent = 'Islands';
+        listHeader.style.marginTop = '8px';
+        listHeader.style.fontWeight = 'bold';
+        toolsList.appendChild(listHeader);
+        for (let i = 0; i < islands.length; i++) {
+          const btn = document.createElement('button');
+          const area = calculateStrokeArea(islands[i]);
+          btn.textContent = `Island ${i + 1} · ${formatArea(area)}`;
+          btn.style.padding = '6px 8px';
+          btn.style.borderRadius = '8px';
+          btn.style.border = '1px solid ' + (selectedIslandIndex === i ? '#4285F4' : '#ccc');
+          btn.style.background = selectedIslandIndex === i ? '#eaf2ff' : '#fff';
+          btn.style.textAlign = 'left';
+          btn.style.cursor = 'pointer';
+          btn.onclick = () => { selectedIslandIndex = i; renderToolsSidebar(); redraw(); };
+          toolsList.appendChild(btn);
+        }
+      }
+    }
+  }
+
+  function polygonArea(points) {
+    if (!points || points.length < 3) return 0;
+    let sum = 0;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      sum += (points[j].x * points[i].y - points[i].x * points[j].y);
+    }
+    return Math.abs(0.5 * sum);
+  }
+
+  function calculateStrokeArea(stroke) {
+    if (!stroke || stroke.length < 3) return 0;
+    // Approximate area by treating stroke as polygon
+    return polygonArea(stroke);
+  }
+
+  function formatArea(area) {
+    if (area >= 1000000) {
+      return (area / 1000000).toFixed(2) + ' km²';
+    } else {
+      return Math.round(area) + ' m²';
+    }
+  }
+
+  function polygonCentroid(points) {
+    const area = polygonArea(points);
+    if (area === 0) return { x: points[0].x, y: points[0].y };
+    let cx = 0, cy = 0;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const cross = (points[j].x * points[i].y - points[i].x * points[j].y);
+      cx += (points[j].x + points[i].x) * cross;
+      cy += (points[j].y + points[i].y) * cross;
+    }
+    const factor = 1 / (3 * area);
+    return { x: cx * factor, y: cy * factor };
+  }
+
+  function pointInPolygon(point, poly) {
+    if (!poly || poly.length < 3) return false;
+    // Ray casting
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x, yi = poly[i].y;
+      const xj = poly[j].x, yj = poly[j].y;
+      const intersect = ((yi > point.y) !== (yj > point.y)) &&
+        (point.x < (xj - xi) * (point.y - yi) / (yj - yi + 1e-9) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  function findIslandAtPoint(pt) {
+    for (let i = islands.length - 1; i >= 0; i--) {
+      if (pointInPolygon(pt, islands[i])) return i;
+    }
+    return -1;
+  }
+
+  // Bounding box helper functions for scale tool
+  function getBoundingBox(points) {
+    if (!points || points.length === 0) return { x:0, y:0, w:0, h:0, cx:0, cy:0 };
+    let minX = points[0].x, minY = points[0].y, maxX = points[0].x, maxY = points[0].y;
+    for (let p of points) {
+      if (p.x < minX) minX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y > maxY) maxY = p.y;
+    }
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY, cx: (minX+maxX)/2, cy: (minY+maxY)/2 };
+  }
+
+  function drawSelectionBoxForIsland(idx) {
+    if (idx < 0 || !islands[idx]) return;
+    const box = getBoundingBox(islands[idx]);
+    const topLeft = worldToScreen({x:box.x, y:box.y});
+    const topRight = worldToScreen({x:box.x + box.w, y:box.y});
+    const bottomLeft = worldToScreen({x:box.x, y:box.y + box.h});
+    const bottomRight = worldToScreen({x:box.x + box.w, y:box.y + box.h});
+    const midTop = { x: (topLeft.x + topRight.x)/2, y: (topLeft.y + topRight.y)/2 };
+    const midBottom = { x: (bottomLeft.x + bottomRight.x)/2, y: (bottomLeft.y + bottomRight.y)/2 };
+    const midLeft = { x: (topLeft.x + bottomLeft.x)/2, y: (topLeft.y + bottomLeft.y)/2 };
+    const midRight = { x: (topRight.x + bottomRight.x)/2, y: (topRight.y + bottomRight.y)/2 };
+    
+    ctx.save();
+    // Reset transform to screen space for drawing handles
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    
+    // Stroke rectangle
+    ctx.setLineDash([6,4]);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgba(43,139,242,0.85)';
+    ctx.strokeRect(topLeft.x, topLeft.y, topRight.x - topLeft.x, bottomLeft.y - topLeft.y);
+    ctx.setLineDash([]);
+    
+    // Draw handles (8 handles)
+    const handles = [ topLeft, midTop, topRight, midRight, bottomRight, midBottom, bottomLeft, midLeft ];
+    for (let h of handles) {
+      ctx.beginPath();
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = '#2b8bf2';
+      ctx.lineWidth = 1.4;
+      ctx.rect(h.x - 6, h.y - 6, 12, 12);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function hitTestHandle(screenX, screenY, idx) {
+    if (idx < 0 || !islands[idx]) return -1;
+    const box = getBoundingBox(islands[idx]);
+    const topLeft = worldToScreen({x:box.x, y:box.y});
+    const topRight = worldToScreen({x:box.x + box.w, y:box.y});
+    const bottomLeft = worldToScreen({x:box.x, y:box.y + box.h});
+    const bottomRight = worldToScreen({x:box.x + box.w, y:box.y + box.h});
+    const midTop = { x: (topLeft.x + topRight.x)/2, y: (topLeft.y + topRight.y)/2 };
+    const midBottom = { x: (bottomLeft.x + bottomRight.x)/2, y: (bottomLeft.y + bottomRight.y)/2 };
+    const midLeft = { x: (topLeft.x + bottomLeft.x)/2, y: (topLeft.y + bottomLeft.y)/2 };
+    const midRight = { x: (topRight.x + bottomRight.x)/2, y: (topRight.y + bottomRight.y)/2 };
+    const handles = [ topLeft, midTop, topRight, midRight, bottomRight, midBottom, bottomLeft, midLeft ];
+    for (let i=0; i<handles.length; i++) {
+      const h = handles[i];
+      if (Math.abs(screenX - h.x) <= 8 && Math.abs(screenY - h.y) <= 8) return i;
+    }
+    return -1;
+  }
+
+  function distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function tryCloseIsland() {
+    if (!isCreatingIsland || currentIslandPoints.length < 3) return;
+    const start = currentIslandPoints[0];
+    const end = currentIslandPoints[currentIslandPoints.length - 1];
+    const threshold = 12 / scale;
+    if (distance(start, end) <= threshold) {
+      islands.push([...currentIslandPoints]);
+      isCreatingIsland = false;
+      currentIslandPoints = [];
+    }
+  }
+
+  if (layerSketchBtn) layerSketchBtn.onclick = () => setActiveLayer('sketch');
+  if (layerIslandBtn) layerIslandBtn.onclick = () => setActiveLayer('island');
+
+  // High-DPI resize to full window
+  function resizeCanvasToWindow() {
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const cssWidth = window.innerWidth;
+    const cssHeight = window.innerHeight;
+    if (canvas.width !== Math.floor(cssWidth * dpr) || canvas.height !== Math.floor(cssHeight * dpr)) {
+      canvas.width = Math.floor(cssWidth * dpr);
+      canvas.height = Math.floor(cssHeight * dpr);
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      redraw();
+    }
+  }
+
+  window.addEventListener('resize', resizeCanvasToWindow);
+
+  // Coordinate transforms
+  function screenToWorld(sx, sy) {
+    return { x: (sx - offsetX) / scale, y: (sy - offsetY) / scale };
+  }
+
+  function worldToScreen(p) {
+    return { x: p.x * scale + offsetX, y: p.y * scale + offsetY };
+  }
+
+  function redraw() {
+    // Clear screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Setup transform: world -> screen
+    ctx.save();
+    ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+    // Draw white background grid (optional subtle grid)
+    if (showGrid) {
+      drawGrid();
+    }
+
+    // Draw all strokes (sketch layer)
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = penColor;
+    ctx.lineWidth = 3 / scale; // keep visual size constant with zoom
+    
+    // Apply sketch layer visibility when on island layer
+    if (activeLayer === 'island') {
+      ctx.globalAlpha = sketchLayerVisibility;
+    } else {
+      ctx.globalAlpha = 1.0; // Full visibility when on sketch layer
+    }
+    
+    for (let i = 0; i < strokes.length; i++) {
+      const pts = strokes[i];
+      if (!pts || pts.length === 0) continue;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let j = 1; j < pts.length; j++) {
+        const p = pts[j];
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+    
+    // Reset globalAlpha for other elements
+    ctx.globalAlpha = 1.0;
+
+    // Draw islands (island layer)
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#1b5e20';
+    ctx.lineWidth = 2.5 / scale;
+    for (let k = 0; k < islands.length; k++) {
+      const poly = islands[k];
+      if (!poly || poly.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for (let m = 1; m < poly.length; m++) {
+        ctx.lineTo(poly[m].x, poly[m].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    // Draw islands as dotted strokes
+    if (activeLayer === 'island') {
+      ctx.save();
+      ctx.setLineDash([8 / scale, 8 / scale]);
+      for (let i = 0; i < islands.length; i++) {
+        const stroke = islands[i];
+        if (!stroke || stroke.length === 0) continue;
+        
+        // Highlight selected island
+        if (i === selectedIslandIndex) {
+          ctx.strokeStyle = '#ff6b35';
+          ctx.lineWidth = 4 / scale;
+        } else {
+          ctx.strokeStyle = '#00695c';
+          ctx.lineWidth = 3 / scale;
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (let j = 1; j < stroke.length; j++) {
+          ctx.lineTo(stroke[j].x, stroke[j].y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Draw current island stroke while drawing
+    if (currentStroke && currentStroke.length > 0 && activeTool === 'island-dotted') {
+      ctx.save();
+      ctx.setLineDash([8 / scale, 8 / scale]);
+      ctx.strokeStyle = '#00695c';
+      ctx.lineWidth = 3 / scale;
+      ctx.beginPath();
+      ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
+      for (let k = 1; k < currentStroke.length; k++) {
+        ctx.lineTo(currentStroke[k].x, currentStroke[k].y);
+      }
+      ctx.stroke();
+      ctx.restore();
+      
+      // Draw start point marker
+      const start = currentStroke[0];
+      ctx.save();
+      ctx.fillStyle = '#00695c';
+      const r = 8 / scale;
+      ctx.beginPath();
+      ctx.arc(start.x, start.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Draw current stroke while drawing
+    if (currentStroke && currentStroke.length > 0 && activeTool === 'pen') {
+      // Apply sketch layer visibility when on island layer
+      if (activeLayer === 'island') {
+        ctx.globalAlpha = sketchLayerVisibility;
+      } else {
+        ctx.globalAlpha = 1.0; // Full visibility when on sketch layer
+      }
+      
+      ctx.strokeStyle = penColor;
+      ctx.beginPath();
+      ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
+      for (let k = 1; k < currentStroke.length; k++) {
+        const q = currentStroke[k];
+        ctx.lineTo(q.x, q.y);
+      }
+      ctx.stroke();
+      
+      // Reset globalAlpha
+      ctx.globalAlpha = 1.0;
+    }
+
+    ctx.restore();
+    
+    // Draw selection box for scale tool
+    if (activeLayer === 'island' && activeTool === 'island-scale' && selectedIslandIndex >= 0) {
+      drawSelectionBoxForIsland(selectedIslandIndex);
+    }
+  }
+
+  // Input handling
+  canvas.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); // disable right-click menu for panning
+  });
+
+  canvas.addEventListener('mousedown', function(e) {
+    if (!drawingEnabled) return;
+    const rect = canvas.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    lastMouseX = sx;
+    lastMouseY = sy;
+
+    // Right button -> pan, Left button -> draw
+    if (e.button === 2) {
+      isPanning = true;
+    } else if (e.button === 0) {
+      const pt = screenToWorld(sx, sy);
+      if (activeLayer === 'sketch' && (activeTool === 'pen' || activeTool === 'eraser')) {
+        isDrawing = true;
+        currentStroke = [pt];
+        redraw();
+      } else if (activeLayer === 'island') {
+        if (activeTool === 'island-scale') {
+          // If none selected, try select one under cursor
+          if (selectedIslandIndex < 0) {
+            const idx = findIslandAtPoint(pt);
+            if (idx >= 0) selectedIslandIndex = idx;
+            else return; // nothing to scale
+          }
+          
+          const idx = selectedIslandIndex;
+          const hit = hitTestHandle(sx, sy, idx);
+          const box = getBoundingBox(islands[idx]);
+          
+          bboxTransformState = {
+            islandIndex: idx,
+            handleIndex: hit,
+            startMouseWorld: pt,
+            startBox: box,
+            basePoints: islands[idx].map(p => ({x:p.x, y:p.y})),
+            centerWorld: { x: box.cx, y: box.cy }
+          };
+          
+          if (hit >= 0) {
+            // Scale anchored at the opposite handle
+            let opposite = (hit + 4) % 8;
+            const corners = [
+              {x:box.x, y:box.y},
+              {x:box.x + box.w/2, y:box.y},
+              {x:box.x + box.w, y:box.y},
+              {x:box.x + box.w, y:box.y + box.h/2},
+              {x:box.x + box.w, y:box.y + box.h},
+              {x:box.x + box.w/2, y:box.y + box.h},
+              {x:box.x, y:box.y + box.h},
+              {x:box.x, y:box.y + box.h/2}
+            ];
+            bboxTransformState.anchorWorld = { x: corners[opposite].x, y: corners[opposite].y };
+            bboxTransformState.mode = 'handle-scale';
+          } else {
+            // Check if clicked inside box but not on a handle -> allow dragging box (move island)
+            const sTopLeft = worldToScreen({x:box.x, y:box.y});
+            const sBottomRight = worldToScreen({x:box.x+box.w, y:box.y+box.h});
+            if (sx >= sTopLeft.x && sx <= sBottomRight.x && sy >= sTopLeft.y && sy <= sBottomRight.y) {
+              bboxTransformState.mode = 'dragging-box';
+              bboxTransformState.dragStartWorld = pt;
+              bboxTransformState.basePoints = islands[idx].map(p => ({x:p.x, y:p.y}));
+            } else {
+              bboxTransformState = null;
+            }
+          }
+          
+          if (bboxTransformState) {
+            e.preventDefault();
+            redraw();
+          }
+        } else if (activeTool === 'island-move' || activeTool === 'island-select') {
+          let hit = -1;
+          for (let i = islands.length - 1; i >= 0; i--) {
+            if (pointInPolygon(pt, islands[i])) { hit = i; break; }
+          }
+          if (hit !== -1) {
+            selectedIslandIndex = hit;
+            if (activeTool === 'island-move') {
+              islandDragState = { mode: 'move', startWorld: pt, originalPoints: islands[selectedIslandIndex].map(p => ({...p})) };
+            }
+            renderToolsSidebar();
+            redraw();
+          } else {
+            selectedIslandIndex = -1;
+            renderToolsSidebar();
+            redraw();
+          }
+        } else if (activeTool === 'island-dotted') {
+          if (currentStroke && currentStroke.length > 0) {
+            // Check if clicking on start circle
+            const start = currentStroke[0];
+            if (distance(pt, start) <= 8 / scale) {
+              // Finish island
+              islands.push(currentStroke);
+              const area = calculateStrokeArea(currentStroke);
+              showIslandNotification(islands.length, area);
+              currentStroke = null;
+              renderToolsSidebar();
+              redraw();
+              return;
+            }
+          }
+          isDrawing = true;
+          currentStroke = [pt];
+          redraw();
+        }
+      }
+    }
+  });
+
+  window.addEventListener('mouseup', function() {
+    if (!drawingEnabled) return;
+    if (isDrawing) {
+      isDrawing = false;
+      if (currentStroke && currentStroke.length > 0) {
+        if (activeTool === 'pen') {
+          strokes.push(currentStroke);
+        } else if (activeTool === 'island-dotted') {
+          islands.push(currentStroke);
+          const area = calculateStrokeArea(currentStroke);
+          showIslandNotification(islands.length, area);
+          renderToolsSidebar();
+        }
+      }
+      currentStroke = null;
+      redraw();
+    }
+    if (islandDragState) {
+      islandDragState = null;
+      redraw();
+    }
+    
+    if (bboxTransformState) {
+      bboxTransformState = null;
+      if (typeof updateCanvasCursor === 'function') updateCanvasCursor();
+      redraw();
+    }
+    isPanning = false;
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!drawingEnabled) return;
+    const rect = canvas.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const world = screenToWorld(sx, sy);
+    if (isPanning) {
+      // Move offset in screen space
+      offsetX += (sx - lastMouseX);
+      offsetY += (sy - lastMouseY);
+      lastMouseX = sx;
+      lastMouseY = sy;
+      redraw();
+    } else if (isDrawing) {
+      const pt = world;
+      
+      if (activeTool === 'eraser') {
+        // Eraser logic: remove parts of existing strokes
+        eraseStrokes(pt);
+      } else if (activeTool === 'island-dotted') {
+        // Island dotted pen logic
+        if (!currentStroke || currentStroke.length === 0) {
+          currentStroke = [pt];
+        } else {
+          const lp = currentStroke[currentStroke.length - 1];
+          if (lp.x !== pt.x || lp.y !== pt.y) currentStroke.push(pt);
+        }
+      } else {
+        // Pen logic: add to current stroke
+        if (!currentStroke || currentStroke.length === 0) {
+          currentStroke = [pt];
+        } else {
+          const lp = currentStroke[currentStroke.length - 1];
+          if (lp.x !== pt.x || lp.y !== pt.y) currentStroke.push(pt);
+        }
+      }
+      redraw();
+    } else if (activeLayer === 'island' && islandDragState && selectedIslandIndex !== -1) {
+      if (islandDragState.mode === 'move') {
+        const dx = world.x - islandDragState.startWorld.x;
+        const dy = world.y - islandDragState.startWorld.y;
+        islands[selectedIslandIndex] = islandDragState.originalPoints.map(p => ({ x: p.x + dx, y: p.y + dy }));
+        redraw();
+      }
+    }
+    
+    // Handle bounding box transform (scale tool)
+    if (bboxTransformState) {
+      const st = bboxTransformState;
+      const idx = st.islandIndex;
+      if (!islands[idx]) return;
+      
+      if (st.mode === 'dragging-box' && st.dragStartWorld) {
+        const dx = world.x - st.dragStartWorld.x;
+        const dy = world.y - st.dragStartWorld.y;
+        islands[idx] = st.basePoints.map(p => ({ x: p.x + dx, y: p.y + dy }));
+        redraw();
+        return;
+      }
+      
+      if (st.mode === 'handle-scale' && typeof st.handleIndex === 'number' && st.handleIndex >= 0) {
+        const anchor = st.anchorWorld;
+        const startBox = st.startBox;
+        
+        const cornerWorldPositions = [
+          {x: startBox.x, y: startBox.y},
+          {x: startBox.x + startBox.w/2, y: startBox.y},
+          {x: startBox.x + startBox.w, y: startBox.y},
+          {x: startBox.x + startBox.w, y: startBox.y + startBox.h/2},
+          {x: startBox.x + startBox.w, y: startBox.y + startBox.h},
+          {x: startBox.x + startBox.w/2, y: startBox.y + startBox.h},
+          {x: startBox.x, y: startBox.y + startBox.h},
+          {x: startBox.x, y: startBox.y + startBox.h/2}
+        ];
+        
+        const startHandleWorld = cornerWorldPositions[st.handleIndex];
+        const startDX = startHandleWorld.x - anchor.x;
+        const startDY = startHandleWorld.y - anchor.y;
+        const currDX = world.x - anchor.x;
+        const currDY = world.y - anchor.y;
+        
+        const eps = 1e-6;
+        // Prevent divide-by-zero or inverted axes
+        const rawScaleX = Math.abs(currDX) / Math.max(eps, Math.abs(startDX));
+        const rawScaleY = Math.abs(currDY) / Math.max(eps, Math.abs(startDY));
+        
+        // Safety clamp (fixes infinite-rectangle bug)
+        let safeScaleX = Math.min(Math.max(rawScaleX, 0.05), 5);
+        let safeScaleY = Math.min(Math.max(rawScaleY, 0.05), 5);
+        
+        // For side handles: only scale on correct axis
+        // Horizontal handles: top-middle (1) and bottom-middle (5)
+        if (st.handleIndex === 1 || st.handleIndex === 5) {
+          safeScaleY = 1; // no vertical scaling for horizontal handles
+        }
+        // Vertical handles: right-middle (3) and left-middle (7)
+        if (st.handleIndex === 3 || st.handleIndex === 7) {
+          safeScaleX = 1; // no horizontal scaling for vertical handles
+        }
+        
+        let appliedScaleX = safeScaleX;
+        let appliedScaleY = safeScaleY;
+        
+        // Corner handles: uniform scaling (average of both axes)
+        const cornerIndices = [0,2,4,6];
+        if (cornerIndices.includes(st.handleIndex)) {
+          const avg = (safeScaleX + safeScaleY) / 2;
+          appliedScaleX = appliedScaleY = avg;
+        }
+        
+        // Shift key snaps to 10% increments for precision
+        if (e.shiftKey) {
+          appliedScaleX = Math.round(appliedScaleX * 10) / 10;
+          appliedScaleY = Math.round(appliedScaleY * 10) / 10;
+        }
+        
+        // Final safety clamp (redundant but ensures we never go below minimum)
+        const minScale = 0.05;
+        appliedScaleX = Math.max(minScale, appliedScaleX);
+        appliedScaleY = Math.max(minScale, appliedScaleY);
+        
+        islands[idx] = st.basePoints.map(p => ({
+          x: anchor.x + (p.x - anchor.x) * appliedScaleX,
+          y: anchor.y + (p.y - anchor.y) * appliedScaleY
+        }));
+        
+        redraw();
+        return;
+      }
+    }
+    
+    // Update cursor over handles for UX
+    if (activeLayer === 'island' && activeTool === 'island-scale') {
+      const hit = hitTestHandle(sx, sy, selectedIslandIndex);
+      if (hit >= 0) {
+        if ([0,2,4,6].includes(hit)) canvas.style.cursor = 'nwse-resize';
+        else if ([1,5].includes(hit)) canvas.style.cursor = 'ew-resize';
+        else if ([3,7].includes(hit)) canvas.style.cursor = 'ns-resize';
+      } else {
+        const box = getBoundingBox(islands[selectedIslandIndex] || []);
+        const sTL = worldToScreen({x:box.x, y:box.y});
+        const sBR = worldToScreen({x:box.x+box.w, y:box.y+box.h});
+        if (sx >= sTL.x && sx <= sBR.x && sy >= sTL.y && sy <= sBR.y) canvas.style.cursor = 'move';
+        else canvas.style.cursor = 'crosshair';
+      }
+    }
+  });
+
+  canvas.addEventListener('wheel', function(e) {
+    if (!drawingEnabled) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const worldBefore = screenToWorld(sx, sy);
+
+    const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+    const newScale = Math.max(minScale, Math.min(maxScale, scale * factor));
+    const scaleChange = newScale / scale;
+    scale = newScale;
+
+    // Keep the point under the cursor stationary in screen space
+    offsetX = sx - worldBefore.x * scale;
+    offsetY = sy - worldBefore.y * scale;
+    redraw();
+  }, { passive: false });
+
+  function clearCanvas() {
+    strokes = [];
+    currentStroke = null;
+    islands = [];
+    isCreatingIsland = false;
+    currentIslandPoints = [];
+    redraw();
+  }
+
+
+  // Eraser functionality
+  function eraseStrokes(erasePoint) {
+    const eraserRadius = 20 / scale; // Eraser size in world coordinates
+    
+    for (let i = strokes.length - 1; i >= 0; i--) {
+      const stroke = strokes[i];
+      const newStroke = [];
+      
+      for (let j = 0; j < stroke.length; j++) {
+        const point = stroke[j];
+        const distance = Math.sqrt(
+          Math.pow(point.x - erasePoint.x, 2) + 
+          Math.pow(point.y - erasePoint.y, 2)
+        );
+        
+        // Keep points that are outside the eraser radius
+        if (distance > eraserRadius) {
+          newStroke.push(point);
+        }
+      }
+      
+      // If the stroke has remaining points, keep it, otherwise remove it
+      if (newStroke.length > 0) {
+        strokes[i] = newStroke;
+      } else {
+        strokes.splice(i, 1);
+      }
+    }
+  }
+
+  // Update canvas cursor based on active tool
+  function updateCanvasCursor() {
+    if (activeTool === 'eraser') {
+      canvas.style.cursor = 'crosshair';
+    } else if (activeTool === 'pen' || activeTool === 'island-dotted') {
+      canvas.style.cursor = 'crosshair';
+    } else if (activeTool === 'island-move') {
+      canvas.style.cursor = 'move';
+    } else if (activeTool === 'island-scale') {
+      canvas.style.cursor = 'nw-resize';
+    } else {
+      canvas.style.cursor = 'default';
+    }
+  }
+
+  // Ensure canvas is sized correctly when app shows
+  resizeCanvasToWindow();
+
+  // Initialize tools UI
+  let lastMouseWorld = null;
+  renderToolsSidebar();
+  setActiveLayer('sketch');
+
+  // Advanced Color Picker Functions
+  let currentHue = 0; // 0-360
+  let currentSaturation = 1; // 0-1
+  let currentLightness = 0.5; // 0-1
+  let isDraggingHue = false;
+  let isDraggingSL = false;
+
+  function initializeAdvancedColorPicker() {
+    const hueWheel = document.getElementById('hueWheel');
+    const saturationCanvas = document.getElementById('saturationCanvas');
+    const hueSelector = document.getElementById('hueSelector');
+    const slSelector = document.getElementById('slSelector');
+    
+    if (!hueWheel || !saturationCanvas) return;
+    
+    // Draw hue wheel
+    drawHueWheel(hueWheel);
+    
+    // Draw saturation/lightness square
+    drawSaturationSquare(saturationCanvas);
+    
+    // Make sure selectors are visible
+    if (hueSelector) {
+      hueSelector.style.display = 'block';
+      hueSelector.style.visibility = 'visible';
+    }
+    if (slSelector) {
+      slSelector.style.display = 'block';
+      slSelector.style.visibility = 'visible';
+    }
+    
+    // Update selectors based on current color
+    updateSelectors();
+    
+    // Add event listeners
+    hueWheel.addEventListener('mousedown', startHueDrag);
+    saturationCanvas.addEventListener('mousedown', startSLDrag);
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', endDrag);
+  }
+
+  function drawHueWheel(canvas) {
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const outerRadius = 85;
+    const innerRadius = 64;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create hue wheel
+    for (let angle = 0; angle < 360; angle += 1) {
+      const startAngle = (angle - 0.5) * Math.PI / 180;
+      const endAngle = (angle + 0.5) * Math.PI / 180;
+      
+      const hue = angle;
+      const color = `hsl(${hue}, 100%, 50%)`;
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+      ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+  }
+
+  function drawSaturationSquare(canvas) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Create saturation/lightness gradient
+    const hueColor = `hsl(${currentHue}, 100%, 50%)`;
+    
+    // Create horizontal gradient (saturation: left = full color, right = white)
+    const horizontalGradient = ctx.createLinearGradient(0, 0, width, 0);
+    horizontalGradient.addColorStop(0, hueColor);
+    horizontalGradient.addColorStop(1, 'white');
+    
+    ctx.fillStyle = horizontalGradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Create vertical gradient (lightness: top = white, bottom = black)
+    const verticalGradient = ctx.createLinearGradient(0, 0, 0, height);
+    verticalGradient.addColorStop(0, 'rgba(255,255,255,0)');
+    verticalGradient.addColorStop(1, 'rgba(0,0,0,1)');
+    
+    ctx.fillStyle = verticalGradient;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  function updateSelectors() {
+    const hueSelector = document.getElementById('hueSelector');
+    const slSelector = document.getElementById('slSelector');
+    
+    if (hueSelector) {
+      const angle = currentHue * Math.PI / 180;
+      const radius = 74.5; // Between inner and outer radius (85 and 64)
+      const centerX = 85; // Half of 170px canvas
+      const centerY = 85;
+      const x = centerX + Math.cos(angle - Math.PI / 2) * radius;
+      const y = centerY + Math.sin(angle - Math.PI / 2) * radius;
+      
+      hueSelector.style.left = (x - 6) + 'px'; // Half of 12px selector width
+      hueSelector.style.top = (y - 6) + 'px'; // Half of 12px selector height
+      hueSelector.style.display = 'block';
+    }
+    
+    if (slSelector) {
+      const x = 30 + currentSaturation * 110; // 30px offset + 110px width
+      const y = 30 + (1 - currentLightness) * 110; // 30px offset + 110px height
+      
+      slSelector.style.left = (x - 6) + 'px'; // Half of 12px selector width
+      slSelector.style.top = (y - 6) + 'px'; // Half of 12px selector height
+      slSelector.style.display = 'block';
+    }
+  }
+
+  function startHueDrag(e) {
+    isDraggingHue = true;
+    handleHueDrag(e);
+  }
+
+  function startSLDrag(e) {
+    isDraggingSL = true;
+    handleSLDrag(e);
+  }
+
+  function handleDrag(e) {
+    if (isDraggingHue) {
+      handleHueDrag(e);
+    } else if (isDraggingSL) {
+      handleSLDrag(e);
+    }
+  }
+
+  function endDrag() {
+    isDraggingHue = false;
+    isDraggingSL = false;
+  }
+
+  function handleHueDrag(e) {
+    const hueWheel = document.getElementById('hueWheel');
+    if (!hueWheel) return;
+    
+    const rect = hueWheel.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const x = e.clientX - centerX;
+    const y = e.clientY - centerY;
+    
+    const angle = Math.atan2(y, x) + Math.PI / 2;
+    currentHue = (angle * 180 / Math.PI + 360) % 360;
+    
+    updateColor();
+    drawSaturationSquare(document.getElementById('saturationCanvas'));
+    updateSelectors();
+  }
+
+  function handleSLDrag(e) {
+    const saturationSquare = document.getElementById('saturationSquare');
+    if (!saturationSquare) return;
+    
+    const rect = saturationSquare.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    // Clamp values to stay within bounds
+    currentSaturation = Math.max(0, Math.min(1, x));
+    currentLightness = Math.max(0, Math.min(1, 1 - y));
+    
+    updateColor();
+    updateSelectors();
+  }
+
+  function updateColor() {
+    const color = `hsl(${currentHue}, ${Math.round(currentSaturation * 100)}%, ${Math.round(currentLightness * 100)}%)`;
+    penColor = color;
+    
+    const currentColorPreview = document.getElementById('currentColorPreview');
+    const colorValue = document.getElementById('colorValue');
+    const customColorPicker = document.getElementById('customColorPicker');
+    
+    if (currentColorPreview) currentColorPreview.style.background = color;
+    if (colorValue) colorValue.textContent = color;
+    if (customColorPicker) customColorPicker.value = color;
+  }
+
+  function updateAdvancedColorPicker() {
+    // Accept penColor in either hex (#rrggbb or #rgb) or hsl(...) and update currentHue/currentSaturation/currentLightness
+    if (typeof penColor !== 'string') return;
+
+    // If penColor is hsl(...) parse directly
+    if (penColor.trim().toLowerCase().startsWith('hsl')) {
+      const m = penColor.match(/hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/i);
+      if (m) {
+        currentHue = parseFloat(m[1]) || 0;
+        currentSaturation = (parseFloat(m[2]) || 0) / 100;
+        currentLightness = (parseFloat(m[3]) || 0) / 100;
+        drawSaturationSquare(document.getElementById('saturationCanvas'));
+        updateSelectors();
+        return;
+      }
+    }
+
+    // Otherwise expect a hex color like #rrggbb or #rgb
+    let hex = penColor.trim();
+    if (!hex.startsWith('#')) {
+      return;
+    }
+    // Expand short form #rgb -> #rrggbb
+    if (/^#([0-9a-f]{3})$/i.test(hex)) {
+      hex = hex.replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i, function(_, r, g, b) {
+        return '#' + r + r + g + g + b + b;
+      });
+    }
+    const clean = hex.replace('#', '');
+    if (clean.length !== 6) return;
+
+    const r = parseInt(clean.substr(0, 2), 16) / 255;
+    const g = parseInt(clean.substr(2, 2), 16) / 255;
+    const b = parseInt(clean.substr(4, 2), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+
+    // Hue
+    let h = 0;
+    if (diff !== 0) {
+      if (max === r) h = ((g - b) / diff) % 6;
+      else if (max === g) h = (b - r) / diff + 2;
+      else h = (r - g) / diff + 4;
+    }
+    currentHue = (h * 60 + 360) % 360;
+
+    // Lightness
+    currentLightness = (max + min) / 2;
+
+    // Saturation
+    if (diff === 0) currentSaturation = 0;
+    else currentSaturation = diff / (1 - Math.abs(2 * currentLightness - 1));
+
+    drawSaturationSquare(document.getElementById('saturationCanvas'));
+    updateSelectors();
+  }
+
+
+  function drawGrid() {
+    // Smooth grid scaling based on zoom level
+    // Base size = 10 meters, scales smoothly with zoom
+    const baseGridSize = 10;
+    
+    // Calculate smooth grid size based on zoom scale with gentler scaling
+    // Use a gentler curve (power of 0.5) to make grid less sensitive to zoom changes
+    let dynamicGridSize = baseGridSize / Math.pow(scale, 0.5);
+    
+    // Round to nice values but allow more granular changes
+    // Round to powers of 10 but with smaller steps for smoother transitions
+    const log10 = Math.log10(dynamicGridSize);
+    const roundedLog10 = Math.round(log10 * 2) / 2; // Allow half-steps like 0.5, 1.5, 2.5
+    dynamicGridSize = Math.pow(10, roundedLog10);
+    
+    // Ensure minimum and maximum grid sizes
+    dynamicGridSize = Math.max(0.1, Math.min(10000, dynamicGridSize));
+    
+    // Show notification when grid size changes
+    if (lastGridSize !== dynamicGridSize) {
+      showGridNotification(dynamicGridSize);
+      lastGridSize = dynamicGridSize;
+    }
+
+    // Get visible world coordinates
+    const viewTopLeft = screenToWorld(0, 0);
+    const viewBottomRight = screenToWorld(canvas.width, canvas.height);
+
+    // Snap grid lines to world coordinates
+    const xStart = Math.floor(viewTopLeft.x / dynamicGridSize) * dynamicGridSize;
+    const yStart = Math.floor(viewTopLeft.y / dynamicGridSize) * dynamicGridSize;
+    const xEnd = Math.ceil(viewBottomRight.x / dynamicGridSize) * dynamicGridSize;
+    const yEnd = Math.ceil(viewBottomRight.y / dynamicGridSize) * dynamicGridSize;
+
+    // Draw grid lines
+    ctx.save();
+    ctx.strokeStyle = '#eaeaea';
+    ctx.lineWidth = 1 / scale;
+    ctx.beginPath();
+
+    for (let x = xStart; x <= xEnd; x += dynamicGridSize) {
+      ctx.moveTo(x, yStart);
+      ctx.lineTo(x, yEnd);
+    }
+    for (let y = yStart; y <= yEnd; y += dynamicGridSize) {
+      ctx.moveTo(xStart, y);
+      ctx.lineTo(xEnd, y);
+    }
+
+    ctx.stroke();
+    ctx.restore();
+
+    // --- grid size label (drawn in screen space) ---
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset to screen space
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+
+    // Format label text with proper units
+    let labelText;
+    if (dynamicGridSize >= 1000) {
+      labelText = `${(dynamicGridSize / 1000)} km`;
+    } else if (dynamicGridSize < 1) {
+      labelText = `${dynamicGridSize} m`;
+    } else {
+      labelText = `${Math.round(dynamicGridSize)} m`;
+    }
+
+    // Calculate text dimensions
+    const padding = 8;
+    const textWidth = ctx.measureText(labelText).width;
+    const textHeight = 20;
+    const x = 15;
+    const y = canvas.height - 15;
+    
+    // Draw background with shadow for better visibility
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(x - padding + 2, y - textHeight + 2, textWidth + padding * 2, textHeight);
+    
+    // Draw main background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fillRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight);
+    
+    // Draw border
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x - padding, y - textHeight, textWidth + padding * 2, textHeight);
+
+    // Draw text
+    ctx.fillStyle = '#000';
+    ctx.fillText(labelText, x, y);
+    ctx.restore();
+  }
+  
+  function showGridNotification(gridSize) {
+    // Clear existing timeout
+    if (gridNotificationTimeout) {
+      clearTimeout(gridNotificationTimeout);
+    }
+    
+    // Remove existing notification
+    const existing = document.getElementById('gridNotification');
+    if (existing) existing.remove();
+    
+    // Create notification
+    const notification = document.createElement('div');
+    notification.id = 'gridNotification';
+    notification.style.position = 'fixed';
+    notification.style.top = '120px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.background = 'rgba(0, 0, 0, 0.8)';
+    notification.style.color = 'white';
+    notification.style.padding = '12px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.fontSize = '16px';
+    notification.style.fontWeight = 'bold';
+    notification.style.zIndex = '9999';
+    notification.style.pointerEvents = 'none';
+    
+    // Format text
+    let text;
+    if (gridSize >= 1000) {
+      text = `Grid: ${gridSize / 1000} km squares`;
+    } else if (gridSize < 1) {
+      text = `Grid: ${gridSize} m squares`;
+    } else {
+      text = `Grid: ${Math.round(gridSize)} m squares`;
+    }
+    notification.textContent = text;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 2 seconds
+    gridNotificationTimeout = setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 2000);
+  }
+
+  function showIslandNotification(islandNumber, area) {
+    // Remove existing notification
+    const existing = document.getElementById('islandNotification');
+    if (existing) existing.remove();
+    
+    // Create notification
+    const notification = document.createElement('div');
+    notification.id = 'islandNotification';
+    notification.style.position = 'fixed';
+    notification.style.top = '160px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.background = 'rgba(0, 105, 92, 0.9)';
+    notification.style.color = 'white';
+    notification.style.padding = '12px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.fontSize = '16px';
+    notification.style.fontWeight = 'bold';
+    notification.style.zIndex = '9999';
+    notification.style.pointerEvents = 'none';
+    
+    notification.textContent = `Island ${islandNumber} created: ${formatArea(area)}`;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 3000);
+  }
+
+
+
+  // Sidebar menu logic
+  const menuBtn = document.getElementById('menuBtn');
+  const sideMenu = document.getElementById('sideMenu');
+
+  // Toggle sidebar on click - close if open, open if closed
+  menuBtn.onclick = (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
+    if (sideMenu.classList.contains('open')) {
+      sideMenu.classList.remove('open');
+    } else {
+      sideMenu.classList.add('open');
+    }
+  };
+
+  // Close sidebar when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!sideMenu.contains(e.target) && e.target !== menuBtn) {
+      sideMenu.classList.remove('open');
+    }
+  });
+
+  // Prevent sidebar from closing when clicking inside it
+  sideMenu.onclick = (e) => {
+    e.stopPropagation();
+  };
+
+  // Sidebar menu actions
+  document.getElementById('sideNewFileBtn').onclick = () => newFileBtn.click();
+  document.getElementById('sideOpenFileBtn').onclick = () => openFileBtn.click();
+  document.getElementById('sideSaveFileBtn').onclick = () => saveFileBtn.click();
+  document.getElementById('sideTutorialBtn').onclick = () => window.open('tutorial.html', '_blank');
+
+  // Account modal logic
+  const accountModal = document.getElementById('accountModal');
+  const customLoginBtn = document.getElementById('customLoginBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const userAvatar = document.getElementById('userAvatar');
+  const closeAccountModal = document.getElementById('closeAccountModal');
+  const showRegisterBtn = document.getElementById('showRegisterBtn');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const accountModalTitle = document.getElementById('accountModalTitle');
+  const accountError = document.getElementById('accountError');
+  
+  // Hash password with SHA-256 before storing/comparing to avoid plaintext hardcoded credentials
+  async function hashPassword(password) {
+    try {
+      const enc = new TextEncoder();
+      const data = enc.encode(String(password));
+      const hashBuffer = await (window.crypto && window.crypto.subtle ? window.crypto.subtle.digest('SHA-256', data) : Promise.reject('crypto.subtle not available'));
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (err) {
+      // Fallback: use a simple reversible encoding only if SubtleCrypto unavailable (very unlikely in modern browsers)
+      // Note: this fallback is not cryptographically secure but prevents storing literal raw passwords in code paths.
+      console.warn('Secure hashing not available, falling back to weak hash:', err);
+      let s = String(password);
+      let h = 0;
+      for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+      return 'weak-' + (h >>> 0).toString(16);
+    }
+  }
+
+  // Settings modal refs
+  const settingsModal = document.getElementById('settingsModal');
+  const sideSettingsBtn = document.getElementById('sideSettingsBtn');
+  const closeSettingsModal = document.getElementById('closeSettingsModal');
+  const settingsCreateAccountTab = document.getElementById('settingsCreateAccountTab');
+  const settingsEditProfileTab = document.getElementById('settingsEditProfileTab');
+  const settingsShortcutsTab = document.getElementById('settingsShortcutsTab');
+  const settingsToolUsageTab = document.getElementById('settingsToolUsageTab');
+  const settingsCreateAccountForm = document.getElementById('settingsCreateAccountForm');
+  const settingsEditProfileForm = document.getElementById('settingsEditProfileForm');
+  const settingsShortcuts = document.getElementById('settingsShortcuts');
+  const settingsToolUsage = document.getElementById('settingsToolUsage');
+  const settingsNotice = document.getElementById('settingsNotice');
+  const profilePreview = document.getElementById('profilePreview');
+  const profileImageInput = document.getElementById('profileImageInput');
+  const editFirstName = document.getElementById('editFirstName');
+  const editLastName = document.getElementById('editLastName');
+  const editNewPassword = document.getElementById('editNewPassword');
+  const editConfirmPassword = document.getElementById('editConfirmPassword');
+
+  // Event handlers for settings modal
+  if (customLoginBtn) customLoginBtn.onclick = () => accountModal.style.display = 'flex';
+  if (settingsBtn) settingsBtn.onclick = () => openSettings();
+  if (sideSettingsBtn) sideSettingsBtn.onclick = () => openSettings();
+  if (userAvatar) userAvatar.onclick = () => openSettings('edit');
+  if (closeAccountModal) closeAccountModal.onclick = () => accountModal.style.display = 'none';
+  if (closeSettingsModal) closeSettingsModal.onclick = () => closeSettings();
+  if (showRegisterBtn) showRegisterBtn.onclick = () => {
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
+    accountModalTitle.textContent = 'Create Account';
+  };
+  if (settingsCreateAccountTab) settingsCreateAccountTab.onclick = () => switchTab('create');
+  if (settingsEditProfileTab) settingsEditProfileTab.onclick = () => switchTab('edit');
+  if (settingsShortcutsTab) settingsShortcutsTab.onclick = () => switchTab('shortcuts');
+  if (settingsToolUsageTab) settingsToolUsageTab.onclick = () => switchTab('toolusage');
+  if (profileImageInput) profileImageInput.onchange = function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        openAvatarCropper(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Avatar crop modal elements
+  const avatarCropModal = document.getElementById('avatarCropModal');
+  const avatarCropCanvas = document.getElementById('avatarCropCanvas');
+  const avatarCropCtx = avatarCropCanvas.getContext('2d');
+  const avatarCropApplyBtn = document.getElementById('avatarCropApplyBtn');
+  const avatarCropCancelBtn = document.getElementById('avatarCropCancelBtn');
+
+  // Cropper state
+  let cropImage = new Image();
+  let cropScale = 1;
+  let cropMinScale = 0.25;
+  let cropMaxScale = 6;
+  let cropTranslateX = 0;
+  let cropTranslateY = 0;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let imageStartX = 0;
+  let imageStartY = 0;
+  const cropCanvasSize = 400;
+  const cropRadius = 180; // visible circle radius
+
+  function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+
+  function clampTranslate() {
+    const displayWidth = cropImage.width * cropScale;
+    const displayHeight = cropImage.height * cropScale;
+    const halfW = displayWidth / 2;
+    const halfH = displayHeight / 2;
+    const maxX = halfW - cropRadius;
+    const minX = -maxX;
+    const maxY = halfH - cropRadius;
+    const minY = -maxY;
+    cropTranslateX = clamp(cropTranslateX, minX, maxX);
+    cropTranslateY = clamp(cropTranslateY, minY, maxY);
+  }
+
+  function drawAvatarCropper() {
+    const centerX = avatarCropCanvas.width / 2;
+    const centerY = avatarCropCanvas.height / 2;
+    avatarCropCtx.clearRect(0, 0, avatarCropCanvas.width, avatarCropCanvas.height);
+
+    // Darken outside the circle
+    avatarCropCtx.save();
+    avatarCropCtx.fillStyle = 'rgba(0,0,0,0.5)';
+    avatarCropCtx.beginPath();
+    avatarCropCtx.rect(0, 0, avatarCropCanvas.width, avatarCropCanvas.height);
+    avatarCropCtx.arc(centerX, centerY, cropRadius, 0, Math.PI * 2, true);
+    avatarCropCtx.fill('evenodd');
+    avatarCropCtx.restore();
+
+    // Draw the image clipped to a circle
+    const displayWidth = cropImage.width * cropScale;
+    const displayHeight = cropImage.height * cropScale;
+    const drawX = centerX - displayWidth / 2 + cropTranslateX;
+    const drawY = centerY - displayHeight / 2 + cropTranslateY;
+
+    avatarCropCtx.save();
+    avatarCropCtx.beginPath();
+    avatarCropCtx.arc(centerX, centerY, cropRadius, 0, Math.PI * 2);
+    avatarCropCtx.clip();
+    avatarCropCtx.imageSmoothingQuality = 'high';
+    avatarCropCtx.drawImage(cropImage, drawX, drawY, displayWidth, displayHeight);
+    avatarCropCtx.restore();
+
+    // Guide circle
+    avatarCropCtx.beginPath();
+    avatarCropCtx.arc(centerX, centerY, cropRadius, 0, Math.PI * 2);
+    avatarCropCtx.strokeStyle = '#ffffff';
+    avatarCropCtx.lineWidth = 2;
+    avatarCropCtx.stroke();
+  }
+
+  function openAvatarCropper(dataUrl) {
+    cropImage = new Image();
+    cropImage.onload = function() {
+      // Fit to cover the circle area initially
+      const diameter = cropRadius * 2;
+      const scaleX = diameter / cropImage.width;
+      const scaleY = diameter / cropImage.height;
+      cropScale = Math.max(scaleX, scaleY);
+      cropScale = clamp(cropScale, cropMinScale, cropMaxScale);
+      cropTranslateX = 0;
+      cropTranslateY = 0;
+      avatarCropModal.style.display = 'flex';
+      drawAvatarCropper();
+    };
+    cropImage.src = dataUrl;
+  }
+
+  // Cropper interactions
+  avatarCropCanvas.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    imageStartX = cropTranslateX;
+    imageStartY = cropTranslateY;
+  });
+  window.addEventListener('mouseup', function() { isDragging = false; });
+  window.addEventListener('mouseleave', function() { isDragging = false; });
+  window.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    cropTranslateX = imageStartX + (e.clientX - dragStartX);
+    cropTranslateY = imageStartY + (e.clientY - dragStartY);
+    clampTranslate();
+    drawAvatarCropper();
+  });
+  avatarCropCanvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.06 : 0.94;
+    const prevScale = cropScale;
+    cropScale = clamp(cropScale * factor, cropMinScale, cropMaxScale);
+    // Keep image centered relative to current translation
+    const scaleChange = cropScale / prevScale;
+    cropTranslateX *= scaleChange;
+    cropTranslateY *= scaleChange;
+    clampTranslate();
+    drawAvatarCropper();
+  }, { passive: false });
+
+  avatarCropCancelBtn.addEventListener('click', function() {
+    avatarCropModal.style.display = 'none';
+    if (profileImageInput) profileImageInput.value = '';
+  });
+
+  avatarCropApplyBtn.addEventListener('click', function() {
+    // Render cropped circle to an offscreen canvas with transparent outside
+    const off = document.createElement('canvas');
+    off.width = cropRadius * 2;
+    off.height = cropRadius * 2;
+    const octx = off.getContext('2d');
+    octx.clearRect(0, 0, off.width, off.height);
+    octx.save();
+    octx.beginPath();
+    octx.arc(cropRadius, cropRadius, cropRadius, 0, Math.PI * 2);
+    octx.clip();
+    const displayWidth = cropImage.width * cropScale;
+    const displayHeight = cropImage.height * cropScale;
+    const drawX = cropRadius - displayWidth / 2 + cropTranslateX;
+    const drawY = cropRadius - displayHeight / 2 + cropTranslateY;
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(cropImage, drawX, drawY, displayWidth, displayHeight);
+    octx.restore();
+    const dataUrl = off.toDataURL('image/png');
+    profilePreview.src = dataUrl;
+    profilePreview.style.display = '';
+    avatarCropModal.style.display = 'none';
+    if (profileImageInput) profileImageInput.value = '';
+  });
+
+  // Register logic (single secure handler)
+  registerForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const objective = document.getElementById('registerObjective').value;
+    const mapType = document.getElementById('registerMapType').value;
+    
+    if (!firstName || !lastName || !password || !objective || !mapType) {
+      accountError.textContent = "Please complete all required fields.";
+      return;
+    }
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    if (users.find(u => u.firstName === firstName && u.lastName === lastName)) {
+      accountError.textContent = "Registration failed. Please try different information.";
+      return;
+    }
+    const hashed = await hashPassword(password);
+    const newUser = { firstName, lastName, password: hashed, objective, mapType, profileImage: profilePreview.src || null };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    setCurrentUser(newUser);
+    accountError.textContent = "Account created!";
+    accountModal.style.display = 'none';
+    updateAuthUI();
+    // Open settings to Profile view
+    openSettings('edit');
+  };
+
+  // Login logic (single secure handler)
+  loginForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const firstName = document.getElementById('loginFirstName').value.trim();
+    const lastName = document.getElementById('loginLastName').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const hashed = await hashPassword(password);
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.firstName === firstName && u.lastName === lastName && u.password === hashed);
+    if (user) {
+      accountModal.style.display = 'none';
+      accountError.textContent = '';
+      setCurrentUser(user);
+      updateAuthUI();
+    } else {
+      accountError.textContent = "Login failed. Please check your information.";
+    }
+  };
+
+  // Settings modal logic
+  function getCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem('currentUser') || 'null');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setCurrentUser(user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  }
+
+  function getDefaultAvatarDataUrl() {
+    return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' fill='%23ffffff'/></svg>";
+  }
+
+  function updateAuthUI() {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      if (customLoginBtn) customLoginBtn.style.display = 'none';
+      if (userAvatar) {
+        userAvatar.src = currentUser.profileImage || getDefaultAvatarDataUrl();
+        userAvatar.title = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+        userAvatar.style.display = '';
+      }
+    } else {
+      if (userAvatar) userAvatar.style.display = 'none';
+      if (customLoginBtn) customLoginBtn.style.display = 'block';
+    }
+  }
+
+  function refreshSettingsTabsVisibility() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const hasAnyUser = users.length > 0;
+    const currentUser = getCurrentUser();
+    const shouldShowProfileOnly = hasAnyUser || !!currentUser;
+
+    if (shouldShowProfileOnly) {
+      if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = 'none';
+      if (settingsEditProfileTab) settingsEditProfileTab.style.display = '';
+    } else {
+      if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = '';
+      if (settingsEditProfileTab) settingsEditProfileTab.style.display = 'none';
+    }
+  }
+
+  function openSettings(tab) {
+    settingsModal.style.display = 'flex';
+    refreshSettingsTabsVisibility();
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const hasAnyUser = users.length > 0 || !!getCurrentUser();
+    if (hasAnyUser) {
+      switchTab('edit');
+    } else {
+      switchTab('create');
+    }
+    preloadProfileFromStorage();
+  }
+
+  function closeSettings() {
+    settingsModal.style.display = 'none';
+    settingsNotice.style.display = 'none';
+    settingsNotice.textContent = '';
+  }
+
+  function switchTab(tab) {
+    // Hide all sections by default
+    if (settingsCreateAccountForm) settingsCreateAccountForm.style.display = 'none';
+    if (settingsEditProfileForm) settingsEditProfileForm.style.display = 'none';
+    if (settingsShortcuts) settingsShortcuts.style.display = 'none';
+    if (settingsToolUsage) settingsToolUsage.style.display = 'none';
+
+    // Show selected
+    if (tab === 'create') {
+      if (settingsCreateAccountForm) settingsCreateAccountForm.style.display = '';
+    } else if (tab === 'edit') {
+      if (settingsEditProfileForm) settingsEditProfileForm.style.display = '';
+    } else if (tab === 'shortcuts') {
+      if (settingsShortcuts) settingsShortcuts.style.display = '';
+    } else if (tab === 'toolusage') {
+      if (settingsToolUsage) settingsToolUsage.style.display = '';
+    }
+  }
+
+  function preloadProfileFromStorage() {
+    let user = getCurrentUser();
+    if (!user) {
+      // Fallback to greeting parsing if needed
+      const label = customLoginBtn.textContent || '';
+      const helloPrefix = 'Hello, ';
+      if (label.startsWith(helloPrefix)) {
+        const name = label.substring(helloPrefix.length);
+        const [firstName, lastName] = name.split(' ');
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        user = users.find(u => u.firstName === firstName && u.lastName === lastName) || null;
+      }
+    }
+    if (!user) {
+      editFirstName.value = '';
+      editLastName.value = '';
+      document.getElementById('editObjective').value = '';
+      document.getElementById('editMapType').value = '';
+      profilePreview.src = '';
+      profilePreview.style.display = 'none';
+      return;
+    }
+
+    // Populate edit form with current user data
+    editFirstName.value = user.firstName || '';
+    editLastName.value = user.lastName || '';
+    document.getElementById('editObjective').value = user.objective || '';
+    document.getElementById('editMapType').value = user.mapType || '';
+    if (user.profileImage) {
+      profilePreview.src = user.profileImage;
+      profilePreview.style.display = '';
+    } else {
+      profilePreview.src = '';
+      profilePreview.style.display = 'none';
+    }
+  }
+
+  // Settings create account handler
+  if (settingsCreateAccountForm) {
+    settingsCreateAccountForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const firstName = document.getElementById('settingsRegisterFirstName').value.trim();
+      const lastName = document.getElementById('settingsRegisterLastName').value.trim();
+      const password = document.getElementById('settingsRegisterPassword').value;
+      const objective = document.getElementById('settingsRegisterObjective').value;
+      const mapType = document.getElementById('settingsRegisterMapType').value;
+      
+      if (!firstName || !lastName || !password || !objective || !mapType) {
+        settingsNotice.textContent = 'Please complete all required fields.';
+        settingsNotice.style.display = 'block';
+        return;
+      }
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (users.find(u => u.firstName === firstName && u.lastName === lastName)) {
+        settingsNotice.textContent = 'Registration failed. Please try different information.';
+        settingsNotice.style.display = 'block';
+        return;
+      }
+      const hashed = await hashPassword(password);
+      const newUser = { firstName, lastName, password: hashed, objective, mapType, profileImage: profilePreview.src || null };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      setCurrentUser(newUser);
+      settingsNotice.textContent = 'Account created!';
+      settingsNotice.style.display = 'block';
+      refreshSettingsTabsVisibility();
+      switchTab('edit');
+      editFirstName.value = firstName;
+      editLastName.value = lastName;
+      document.getElementById('editObjective').value = objective;
+      document.getElementById('editMapType').value = mapType;
+      updateAuthUI();
+    };
+  }
+
+  // Settings edit profile handler
+  if (settingsEditProfileForm) {
+    settingsEditProfileForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const newFirst = editFirstName.value.trim();
+      const newLast = editLastName.value.trim();
+      const newPass = editNewPassword.value;
+      const confirmPass = editConfirmPassword.value;
+      const newObjective = document.getElementById('editObjective').value;
+      const newMapType = document.getElementById('editMapType').value;
+      
+      // Basic client-side validation
+      if ((newPass || confirmPass) && newPass !== confirmPass) {
+        settingsNotice.textContent = 'Password entries do not match.';
+        settingsNotice.style.display = 'block';
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      const current = getCurrentUser();
+      if (!current) {
+        settingsNotice.textContent = 'No matching user found. Please create an account first.';
+        settingsNotice.style.display = 'block';
+        return;
+      }
+
+      const idx = users.findIndex(u => u.firstName === current.firstName && u.lastName === current.lastName);
+      if (idx === -1) {
+        settingsNotice.textContent = 'No matching user found. Please create an account first.';
+        settingsNotice.style.display = 'block';
+        return;
+      }
+
+      // If changing password or identity information, require confirmation of current password
+      const isSensitiveChange = !!newPass || (newFirst && newFirst !== current.firstName) || (newLast && newLast !== current.lastName);
+      if (isSensitiveChange) {
+        try {
+          const confirmation = prompt('Please enter your current password to confirm these changes:');
+          if (!confirmation) {
+            settingsNotice.textContent = 'Update cancelled.';
+            settingsNotice.style.display = 'block';
+            return;
+          }
+          const confirmationHash = await hashPassword(confirmation);
+          if (confirmationHash !== users[idx].password) {
+            settingsNotice.textContent = 'Unable to verify current password.';
+            settingsNotice.style.display = 'block';
+            return;
+          }
+        } catch (err) {
+          // In case hashing fails for some reason, block the sensitive change and inform the user generically
+          console.error('Password confirmation failed:', err);
+          settingsNotice.textContent = 'Unable to confirm identity at this time.';
+          settingsNotice.style.display = 'block';
+          return;
+        }
+      }
+
+      // Apply updates
+      const updated = { ...users[idx] };
+      if (newFirst) updated.firstName = newFirst;
+      if (newLast) updated.lastName = newLast;
+      if (newPass) {
+        const hashed = await hashPassword(newPass);
+        updated.password = hashed;
+      }
+      if (newObjective) updated.objective = newObjective;
+      if (newMapType) updated.mapType = newMapType;
+      if (profilePreview.src) updated.profileImage = profilePreview.src;
+      users[idx] = updated;
+      localStorage.setItem('users', JSON.stringify(users));
+      setCurrentUser(updated);
+
+      // Clear sensitive inputs and surface a non-revealing confirmation
+      editNewPassword.value = '';
+      editConfirmPassword.value = '';
+      settingsNotice.textContent = 'Profile updated.';
+      settingsNotice.style.display = 'block';
+      updateAuthUI();
+    };
+  }
+  // Initialize the app
+  updateAuthUI();
+}; // <--- This closes window.onload!
+</script>
+
+</body>
+</html>
