@@ -123,14 +123,14 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 100vw;
-      height: 100vh;
+      width: 150vw;
+      height: 150vh;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
       pointer-events: none;
-      z-index: 5000;
-      opacity: 0.5;
-      animation: gachaPulse 4s infinite alternate;
+      z-index: 4990;
+      opacity: 0.6;
+      animation: gachaPulse 6s infinite alternate;
     }
 
     @keyframes gachaPulse {
@@ -142,14 +142,15 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 260px;
-      height: 260px;
-      margin-top: -130px;
-      margin-left: -130px;
+      width: 280px;
+      height: 280px;
+      margin-top: -140px;
+      margin-left: -140px;
       pointer-events: none;
       z-index: 5001;
-      animation: gachaSpin 15s linear infinite;
-      filter: drop-shadow(0 0 25px rgba(255,255,255,0.9));
+      animation: gachaSpin 20s linear infinite;
+      filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.4));
+      opacity: 0.8;
     }
 
     @keyframes gachaSpin {
@@ -1762,8 +1763,8 @@
 <body>
   <div class="gacha-glow"></div>
   <svg class="gacha-star-center" viewBox="0 0 100 100">
-    <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" fill="#f8fafc" />
-    <path d="M50 20 L53 47 L80 50 L53 53 L50 80 L47 53 L20 50 L47 47 Z" fill="#cbd5e1" opacity="0.6" />
+    <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" fill="#e0f7fa" />
+    <path d="M50 20 L53 47 L80 50 L53 53 L50 80 L47 53 L20 50 L47 47 Z" fill="#4dd0e1" opacity="0.4" />
   </svg>
   <div class="skeletal-wave"></div>
   <div id="topStars"></div>
