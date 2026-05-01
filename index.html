@@ -2,15 +2,33 @@
 <!-- saved from url=(0062)file:///C:/Users/Inventator1/Desktop/html.%20mappit/index.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>mapit</title>
+  <title>Mappit Heartz - Professional Agency Edition</title>
   <style>
     :root {
+      --silver-classic: #C0C0C0;
+      --platinum-shine: #E8E8E8;
+      --cool-steel: #A5A9B4;
+      --silver-wing: #cbd5e1;
       --bg-top: #ffffff;
-      --bg-middle: #fafafa;
-      --bg-bottom: #ffffff;
-      --text-color: #222;
-      --box-shadow: rgba(0,0,0,0.07);
-      --border-color: #eaeaea;
+      --bg-middle: #f1f5f9;
+      --bg-bottom: #e2e8f0;
+      --text-color: #1e293b;
+      --box-shadow: rgba(0,0,0,0.08);
+      --border-color: #e2e8f0;
+    }
+
+    .shimmer-border {
+      border: 2px solid transparent;
+      background-image: linear-gradient(white, white),
+                        linear-gradient(to right, var(--silver-classic), var(--platinum-shine), var(--silver-classic));
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      animation: shimmer 2s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
     
     body {
@@ -75,11 +93,11 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 20vh;
+      height: 100vh;
       width: 100%;
       pointer-events: none;
       overflow: hidden;
-      z-index: 0;
+      z-index: 4997;
     }
     
     .star {
@@ -88,17 +106,122 @@
       height: 3px;
       background: white;
       border-radius: 50%;
-      opacity: 0;
+      opacity: 0.5;
       box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
-      animation: sparkle 2.4s ease-out forwards;
+      animation: sparkle 2.4s ease-out forwards; z-index: 4998;
     }
     
     @keyframes sparkle {
-      0% { opacity: 0; transform: scale(0.2); }
+      0% { opacity: 0.5; transform: scale(0.2); }
       20% { opacity: 1; transform: scale(1); }
       70% { opacity: 0.7; transform: scale(1.2); }
-      100% { opacity: 0; transform: scale(0.3); }
+      100% { opacity: 0.5; transform: scale(0.3); }
     }
+
+    /* Gacha Magical Light Effects */
+    .gacha-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 100vh;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      pointer-events: none;
+      z-index: 5000;
+      opacity: 0.5;
+      animation: gachaPulse 4s infinite alternate;
+    }
+
+    @keyframes gachaPulse {
+      0% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .gacha-star-center {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 260px;
+      height: 260px;
+      margin-top: -130px;
+      margin-left: -130px;
+      pointer-events: none;
+      z-index: 5001;
+      animation: gachaSpin 15s linear infinite;
+      filter: drop-shadow(0 0 25px rgba(255,255,255,0.9));
+    }
+
+    @keyframes gachaSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* GACHA STAR STYLING */
+    .gacha-star {
+      position: fixed;
+      width: 15px;
+      height: 15px;
+      background: var(--platinum-shine);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      filter: drop-shadow(0 0 5px white);
+      animation: fall 3s linear forwards;
+      pointer-events: none;
+      z-index: 5002;
+    }
+
+    @keyframes fall {
+      from { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
+    }
+
+    .skeletal-wave {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);
+      pointer-events: none;
+      z-index: 4999;
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="black"></path></svg>');
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="black"></path></svg>');
+      mask-size: 200% 100%;
+      animation: waveMove 20s linear infinite;
+    }
+
+    @keyframes waveMove {
+      from { mask-position: 0 0; }
+      to { mask-position: 200% 0; }
+    }
+
+    /* Tornado Air Effect for Sidebar */
+    .tornado-air {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0.15;
+    }
+
+    .air-streak {
+      position: absolute;
+      width: 2px;
+      height: 40px;
+      background: white;
+      border-radius: 2px;
+      animation: airFly 2s linear infinite;
+    }
+
+    @keyframes airFly {
+      0% { transform: translateY(110vh) rotate(15deg); opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-10vh) rotate(15deg); opacity: 0.5; }
+    }
+
     #commandBar {
       background: #ffffff;
       color: #334155;
@@ -204,7 +327,11 @@
       border-radius: 16px;
       padding: 18px;
       box-shadow: 0 4px 12px var(--box-shadow);
-      border: 1px solid var(--border-color);
+      border: 2px solid transparent;
+      background-image: linear-gradient(white, white),
+                        linear-gradient(to right, var(--silver-classic), var(--platinum-shine), var(--silver-classic));
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
       transition: all 0.18s ease;
       cursor: pointer;
       display: flex;
@@ -215,6 +342,7 @@
       overflow: hidden;
       position: relative;
       margin: 0;
+      animation: shimmer 4s linear infinite;
     }
     
     .fileMenuBtn {
@@ -768,16 +896,23 @@
       padding: 8px 14px 8px 74px;
       box-sizing: border-box;
       background: rgba(250, 252, 255, 0.97);
-      border-bottom: 1px solid #e4eaf2;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      border-bottom: 1px solid var(--silver-wing);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
       z-index: 2300;
       overflow: hidden;
       transition: transform 0.24s ease, opacity 0.24s ease;
     }
 
+    .silver-wing-divider {
+      height: 1px;
+      background: var(--silver-wing);
+      margin: 12px 0;
+      opacity: 0.8;
+    }
+
     #appTopBar.bar-hidden {
       transform: translateY(-100%);
-      opacity: 0;
+      opacity: 0.5;
       pointer-events: none;
     }
 
@@ -950,7 +1085,7 @@
       gap: 4px;
       padding: 8px;
       background: rgba(255, 255, 255, 0.96);
-      border: 1px solid #e2e8f0;
+      border: 2px solid var(--silver-wing);
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
       z-index: 2200;
@@ -962,7 +1097,7 @@
 
     #layerSwitcher.bar-hidden {
       transform: translateX(calc(-100% - 14px));
-      opacity: 0;
+      opacity: 0.5;
       pointer-events: none;
     }
 
@@ -1362,17 +1497,36 @@
 
     #toolsSidebar {
       width: 280px;
-      border-left: 1px solid #e3eaf2 !important;
+      border-left: 2px solid var(--silver-classic) !important;
       box-shadow: -2px 0 10px rgba(15, 23, 42, 0.06) !important;
       padding: 12px 12px 16px 12px !important;
       transition: transform 0.24s ease, opacity 0.24s ease;
       min-width: 260px;
       max-width: 420px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.8) !important;
+      backdrop-filter: blur(10px);
+    }
+
+    #toolsSidebar::before {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(192, 192, 192, 0.1), transparent);
+      animation: rotateTornado 10s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes rotateTornado {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     #toolsSidebar.bar-hidden {
       transform: translateX(calc(100% + 14px));
-      opacity: 0;
+      opacity: 0.5;
       pointer-events: none;
     }
 
@@ -1606,11 +1760,22 @@
   </style>
 <style type="text/css" id="operaUserStyle"></style></head>
 <body>
+  <div class="gacha-glow"></div>
+  <svg class="gacha-star-center" viewBox="0 0 100 100">
+    <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" fill="#f8fafc" />
+    <path d="M50 20 L53 47 L80 50 L53 53 L50 80 L47 53 L20 50 L47 47 Z" fill="#cbd5e1" opacity="0.6" />
+  </svg>
+  <div class="skeletal-wave"></div>
   <div id="topStars"></div>
   <span id="userInfo" style="display:none; margin: 10px auto; text-align:center;"></span>
 
   <div id="topContainer">
   <input type="text" id="commandBar" placeholder="Search tools or type / for commands...">
+  <div id="codeBankBar" style="width: 100%; height: 32px; background: #2a2a2a; color: #aaa; display: flex; align-items: center; padding: 0 32px; font-size: 11px; letter-spacing: 0.1em; border-bottom: 1px solid #333; z-index: 3201;">
+    <span style="color: #00ffff; margin-right: 8px;">CODE BANK:</span>
+    <span id="codeBankStatus">System Ready. Awaiting recovery string...</span>
+    <button id="codeBankBtn" style="margin-left: auto; background: none; border: 1px solid #444; color: #888; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Recover Map</button>
+  </div>
   <div id="welcomeBar" style="width: 100%; background: rgb(136, 136, 136); color: white; display: flex; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 0px; padding: 0px 32px; min-height: 80px;">
     <div></div>
     <div id="welcomeCenter" style="gap: 73px;">
@@ -1642,9 +1807,9 @@
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"></path><path d="M8 4v6h8V4"></path><path d="M8 20v-6h8v6"></path></svg>
           <span>Save</span>
         </button>
-        <button id="topExportBtn" class="top-action-btn" title="Export">
+        <button id="topDownloadBtn" class="top-action-btn" title="Download">
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M8 7l4-4 4 4"></path><path d="M4 14v7h16v-7"></path></svg>
-          <span>Export</span>
+          <span>Download</span>
         </button>
         <button id="topUndoBtn" class="top-action-btn" title="Undo">
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 10H4V5"></path><path d="M4 10c2-4 5-6 9-6 4.5 0 8 3.5 8 8"></path></svg>
@@ -1795,6 +1960,7 @@
         <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Tools</div>
         <div id="toolsGrid" style="display:grid; grid-template-columns:repeat(3, 56px); gap:8px; align-content:start; justify-content:start; margin-bottom:12px;"></div>
       </div>
+      <div class="silver-wing-divider"></div>
 
       <!-- Color Chooser Section -->
       <div id="sketchLayerSection" style="margin-bottom:16px; display:none;">
@@ -1830,6 +1996,7 @@
         <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Grid Setting</div>
         <div id="gridSettings" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
+      <div class="silver-wing-divider"></div>
 
       <div id="islandSettingSection" style="margin-bottom:16px; display:none;">
         <div class="section-header" style="font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">Island Setting</div>
@@ -1913,12 +2080,14 @@
     </span>
   </button>
   <div id="sideMenu">
+    <div class="tornado-air" id="tornadoContainer"></div>
     <button id="closeSideMenu" class="overlay-close" title="Close Menu">×</button>
     <div class="overlay-menu-grid">
       <section class="overlay-menu-section">
         <h3>Preferences</h3>
         <button id="sideSettingsBtn">Open Preferences</button>
       </section>
+      <div class="silver-wing-divider"></div>
       <section class="overlay-menu-section">
         <h3>Project Settings</h3>
         <button id="sideNewFileBtn">New Project</button>
@@ -1930,8 +2099,8 @@
         <button id="sideGridToggleBtn">Toggle Grid</button>
       </section>
       <section class="overlay-menu-section">
-        <h3>Export</h3>
-        <button id="sideExportBtn">Export PNG</button>
+        <h3>Download</h3>
+        <button id="sideDownloadBtn">Download PNG</button>
       </section>
       <section class="overlay-menu-section">
         <h3>Theme</h3>
@@ -1961,6 +2130,7 @@
           <button id="settingsEditProfileTab">Profile</button>
           <button id="settingsShortcutsTab">Short cuts</button>
           <button id="settingsToolUsageTab">Tool usage</button>
+          <button id="settingsUxConfigTab">UX Config</button>
         </div>
         <div class="content">
           <div id="settingsNotice" style="text-align:center;color:#d00;margin:0 0 12px 0;display:none;"></div>
@@ -2051,6 +2221,27 @@
                 <li>Manage your profile in the Profile tab to personalize your avatar.</li>
               </ol>
             </div>
+            <div id="settingsUxConfig" style="display:none;margin:0;">
+              <h3 style="margin-top:0">UX Configuration</h3>
+              <div style="display:flex; flex-direction:column; gap:15px;">
+                <label>
+                  Point Hit Radius: <span id="val_pointHit">8</span>px
+                  <input type="range" min="4" max="20" value="8" class="ux-slider" data-var="pointHitRadiusPx" style="width:100%;">
+                </label>
+                <label>
+                  Edge Hit Threshold: <span id="val_edgeHit">8</span>px
+                  <input type="range" min="4" max="20" value="8" class="ux-slider" data-var="edgeHitThresholdPx" style="width:100%;">
+                </label>
+                <label>
+                  Snap Distance: <span id="val_snapDist">10</span>px
+                  <input type="range" min="0" max="30" value="10" class="ux-slider" data-var="closeRadiusPx" style="width:100%;">
+                </label>
+                <label>
+                  Freehand Spacing: <span id="val_spacing">6</span>px
+                  <input type="range" min="1" max="15" value="6" class="ux-slider" data-var="freehandPointSpacingPx" style="width:100%;">
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2116,18 +2307,14 @@
   let sceneLayerFilterMode = 'all';
   let sceneLayerPanelRenderKey = '';
   const layerState = {
-    sketch: { visible: true, opacity: 1 },
+    sketching: { visible: true, opacity: 1 },
     island: { visible: true, opacity: 1 },
     parallelism: { visible: true, opacity: 1 },
     water: { visible: true, opacity: 1 },
-    terrain: { visible: true, opacity: 1 },
-    current: { visible: true, opacity: 1 },
+    environment: { visible: true, opacity: 1 },
+    currents: { visible: true, opacity: 1 },
     temperature: { visible: true, opacity: 1 },
-    weather: { visible: true, opacity: 1 },
-    biome: { visible: true, opacity: 1 },
-    political: { visible: true, opacity: 1 },
-    infrastructure: { visible: true, opacity: 1 },
-    zone: { visible: true, opacity: 1 }
+    territory: { visible: true, opacity: 1 },
   };
 
   function cloneSceneSnapshot(source) {
@@ -2483,14 +2670,20 @@
 
   // Centralized layer/mode mapping used by scene + tool routing.
   function modeToLayerKey(mode) {
+    if (mode === "sketch") return "sketching";
     if (mode === 'parallel') return 'parallelism';
     if (mode === 'forest') return 'biome';
+    if (mode === 'terrain') return 'environment';
+    if (mode === 'political') return 'territory';
     return mode;
   }
 
   function layerKeyToMode(layerKey) {
+    if (layerKey === "sketching") return "sketch";
     if (layerKey === 'parallelism') return 'parallel';
     if (layerKey === 'biome') return 'forest';
+    if (layerKey === 'environment') return 'terrain';
+    if (layerKey === 'territory') return 'political';
     return layerKey;
   }
 
@@ -2545,7 +2738,7 @@
   let currentStroke = null;
   let scale = 1;
   const minScale = 0.2;
-  const maxScale = 6;
+  const maxScale = 50;
   let offsetX = 0;
   let offsetY = 0;
   let lastMouseX = 0;
@@ -2579,13 +2772,13 @@
   };
 
   function mapLayerToToolScope(layer) {
-    if (layer === 'sketch') return 'sketching';
+    if (layer === 'sketching') return 'sketching';
     if (layer === 'island') return 'islands';
     if (layer === 'parallelism') return 'paralelism';
-    if (layer === 'terrain') return 'tectonism';
-    if (layer === 'current') return 'currents';
-    if (layer === 'weather' || layer === 'biome') return 'environment';
-    if (layer === 'political' || layer === 'infrastructure' || layer === 'zone') return 'territories';
+    if (layer === 'environment') return 'tectonism';
+    if (layer === 'currents') return 'currents';
+
+    if (layer === 'territory') return 'territories';
     return layer;
   }
 
@@ -2813,9 +3006,9 @@
   const islandInteractionSettings = {
     closeRadiusPx: 10,
     freehandPointSpacingPx: 6,
-    pointHitRadiusPx: 12,
-    edgeHitThresholdPx: 12,
-    bodyHitThresholdPx: 12
+    pointHitRadiusPx: 8,
+    edgeHitThresholdPx: 8,
+    bodyHitThresholdPx: 8
   };
   let isIslandDraggingDraw = false;
   let selectedIslandIndex = -1;
@@ -2959,24 +3152,43 @@
 
   // Star particle system
   function spawnStar() {
+    // Legacy sparkle stars
     const container = document.getElementById("topStars");
-    if (!container) return;
-    const star = document.createElement("div");
-    star.classList.add("star");
-    
-    // random horizontal position
-    star.style.left = Math.random() * 100 + "%";
-    
-    // random delay
-    star.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
-    
-    container.appendChild(star);
-    
-    setTimeout(() => star.remove(), 2500);
+    if (container) {
+      const star = document.createElement("div");
+      star.classList.add("star");
+      star.style.left = Math.random() * 100 + "%";
+      star.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+      star.style.top = Math.random() * 100 + "vh";
+      container.appendChild(star);
+      setTimeout(() => star.remove(), 2500);
+    }
+
+    // New falling gacha stars
+    const gachaStar = document.createElement('div');
+    gachaStar.className = 'gacha-star';
+    gachaStar.style.left = Math.random() * 100 + 'vw';
+    gachaStar.style.top = '-20px';
+    document.body.appendChild(gachaStar);
+    setTimeout(() => gachaStar.remove(), 3000);
   }
   
   window.onload = function() {
-    setInterval(spawnStar, 200 + Math.random() * 400);
+    setInterval(spawnStar, 1500);
+
+    // Initialize Tornado Air Effect
+    const tornadoContainer = document.getElementById('tornadoContainer');
+    if (tornadoContainer) {
+      for (let i = 0; i < 20; i++) {
+        const streak = document.createElement('div');
+        streak.className = 'air-streak';
+        streak.style.left = Math.random() * 100 + '%';
+        streak.style.animationDelay = Math.random() * 2 + 's';
+        streak.style.animationDuration = (1 + Math.random() * 1) + 's';
+        tornadoContainer.appendChild(streak);
+      }
+    }
+
     // Initialize internet connectivity detection
     checkInternetConnection();
   // --- Welcome Banner Logic ---
@@ -3017,6 +3229,12 @@
   document.getElementById('welcomeBar').style.display = 'flex';
     const topStarsEl = document.getElementById('topStars');
     if (topStarsEl) topStarsEl.style.display = 'block';
+    const gachaGlow = document.querySelector('.gacha-glow');
+    if (gachaGlow) gachaGlow.style.display = 'block';
+    const gachaStar = document.querySelector('.gacha-star-center');
+    if (gachaStar) gachaStar.style.display = 'block';
+    const skeletalWave = document.querySelector('.skeletal-wave');
+    if (skeletalWave) skeletalWave.style.display = 'block';
   if (commandBar) commandBar.style.display = 'none'; // Hide command bar on welcome screen
   welcomeButtons.style.display = 'flex';
   recentFilesGrid.style.display = 'grid';
@@ -3312,6 +3530,19 @@
         e.preventDefault();
         return;
       }
+      // Delete selected island point
+      if (selectedIslandIndex >= 0 && selectedIslandPointIndex !== null) {
+        const layer = getActiveLayer();
+        const island = layer.islands[selectedIslandIndex];
+        if (Array.isArray(island) && island.length > 3 && canMutateActiveSceneLayer('island', 'Island point delete')) {
+          island.splice(selectedIslandPointIndex, 1);
+          selectedIslandPointIndex = null;
+          syncIslandSceneObjectFromLegacyIsland(island, selectedIslandIndex);
+          redraw();
+          e.preventDefault();
+          return;
+        }
+      }
     }
     // Ctrl+M to go back to entrance menu
     if (e.ctrlKey && key === 'm') {
@@ -3372,7 +3603,7 @@
   const topCommandSlot = document.getElementById('topCommandSlot');
   const modeSelectorButtons = Array.from(document.querySelectorAll('.mode-selector-btn'));
   const topSaveBtn = document.getElementById('topSaveBtn');
-  const topExportBtn = document.getElementById('topExportBtn');
+  const topDownloadBtn = document.getElementById('topDownloadBtn');
   const topUndoBtn = document.getElementById('topUndoBtn');
   const topRedoBtn = document.getElementById('topRedoBtn');
   const topHamburgerBtn = document.getElementById('topHamburgerBtn');
@@ -3519,11 +3750,25 @@
     return null;
   }
 
-  function exportCanvasPng() {
+  function downloadCanvasPng() {
+    console.log("Jules: Preparing output for download...");
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = `mapit-export-${Date.now()}.png`;
+    link.download = `mapit-download-${Date.now()}.png`;
     link.click();
+  }
+
+  // ELEMENTAL LOADING PHRASES
+  const loadingPhrases = [
+      "Inhaling the ether, the winds of memory begin to stir.",
+      "Piercing the veil of darkness, light reconstructs your lost horizon.",
+      "The starlight awakens to rebuild the fractured world."
+  ];
+
+  function showLoadingEffect() {
+      const phrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+      console.log("Mappit Heartz: " + phrase);
+      // Logic to display this on the UI coming in Phase 6
   }
 
   function adjustZoom(multiplier) {
@@ -4138,9 +4383,17 @@
     document.getElementById('welcomeBanner').style.display = 'none';
     document.getElementById('welcomeButtons').style.display = 'none';
     document.getElementById('recentFilesGrid').style.display = 'none';
+    const cb = document.getElementById('codeBankBar');
+    if (cb) cb.style.display = 'none';
     document.getElementById('welcomeBar').style.display = 'none'; // Hide welcome bar in canvas area
     const topStarsEl = document.getElementById('topStars');
     if (topStarsEl) topStarsEl.style.display = 'none';
+    const gachaGlow = document.querySelector('.gacha-glow');
+    if (gachaGlow) gachaGlow.style.display = 'none';
+    const gachaStar = document.querySelector('.gacha-star-center');
+    if (gachaStar) gachaStar.style.display = 'none';
+    const skeletalWave = document.querySelector('.skeletal-wave');
+    if (skeletalWave) skeletalWave.style.display = 'none';
     if (topCommandSlot && commandBar && commandBar.parentElement !== topCommandSlot) {
       topCommandSlot.appendChild(commandBar);
     }
@@ -4174,9 +4427,17 @@
   function showEntranceMenu() {
     closeLayerContextMenu();
     welcomeBanner.style.display = 'block';
+    const cb = document.getElementById('codeBankBar');
+    if (cb) cb.style.display = 'flex';
     document.getElementById('welcomeBar').style.display = 'flex';
     const topStarsEl = document.getElementById('topStars');
     if (topStarsEl) topStarsEl.style.display = 'block';
+    const gachaGlow = document.querySelector('.gacha-glow');
+    if (gachaGlow) gachaGlow.style.display = 'block';
+    const gachaStar = document.querySelector('.gacha-star-center');
+    if (gachaStar) gachaStar.style.display = 'block';
+    const skeletalWave = document.querySelector('.skeletal-wave');
+    if (skeletalWave) skeletalWave.style.display = 'block';
     getTopContainerHeight();
     if (commandBar) commandBar.style.display = 'none'; // Hide command bar on welcome screen
     welcomeButtons.style.display = 'flex';
@@ -4252,7 +4513,7 @@
   };
 
   if (topSaveBtn) topSaveBtn.onclick = () => saveFileBtn.click();
-  if (topExportBtn) topExportBtn.onclick = () => exportCanvasPng();
+  if (topDownloadBtn) topDownloadBtn.onclick = () => downloadCanvasPng();
   if (topUndoBtn) topUndoBtn.onclick = () => undoLastAction();
   if (topRedoBtn) topRedoBtn.onclick = () => redoLastAction();
   if (topTutorialBtn) topTutorialBtn.onclick = () => window.open('tutorial.html', '_blank');
@@ -4272,18 +4533,14 @@
   }
 
   const layerDisplayNames = {
-    sketch: 'Sketch',
+    sketching: 'Sketching',
     island: 'Island',
     parallelism: 'Parallelism',
     water: 'Water',
-    terrain: 'Terrain',
-    current: 'Current',
+    environment: 'Terrain/Environment',
+    currents: 'Water and Air Current',
     temperature: 'Temperature',
-    weather: 'Weather',
-    biome: 'Biome',
-    political: 'Political',
-    infrastructure: 'Infrastructure',
-    zone: 'Zone'
+    territory: 'Territory',
   };
 
   const emptyToolbarLayers = new Set([
@@ -4476,12 +4733,12 @@
       'island-scale': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 5h14v14H5z"></path><path d="M8 8l8 8"></path><path d="M16 8l-2 0 0 2"></path><path d="M8 16l0-2 2 0"></path></svg>',
       parallel: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"></path></svg>',
       water: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"></path></svg>',
-      terrain: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18l6-9 4 6 3-4 5 7"></path></svg>',
-      current: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 8h10"></path><path d="M10 4l4 4-4 4"></path><path d="M20 16H10"></path><path d="M14 12l-4 4 4 4"></path></svg>',
+      environment: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18l6-9 4 6 3-4 5 7"></path></svg>',
+      currents: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 8h10"></path><path d="M10 4l4 4-4 4"></path><path d="M20 16H10"></path><path d="M14 12l-4 4 4 4"></path></svg>',
       temperature: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0v8a4 4 0 1 1-4 0z"></path></svg>',
       weather: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 17h10a4 4 0 0 0 0-8 5 5 0 0 0-9-2A4 4 0 0 0 7 17z"></path></svg>',
       forest: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 20V8"></path><path d="M12 12c-4 0-6-2-6-6 4 0 6 2 6 6z"></path><path d="M12 12c4 0 6-2 6-6-4 0-6 2-6 6z"></path></svg>',
-      political: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 21V4"></path><path d="M6 5h10l-2 3 2 3H6"></path></svg>',
+      territory: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 21V4"></path><path d="M6 5h10l-2 3 2 3H6"></path></svg>',
       infrastructure: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 21l2-14h6l2 14"></path><path d="M5 11h14"></path></svg>',
       zone: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 6l6-2 4 2 6-2v14l-6 2-4-2-6 2z"></path><path d="M10 4v14M14 6v14"></path></svg>'
     };
@@ -5006,7 +5263,7 @@
     return changed;
   }
 
-  function hitTestIslandBodyAtWorldPoint(pt, islandIndex, thresholdPx = islandInteractionSettings.bodyHitThresholdPx) {
+  function hitTestIslandBodyAtWorldPoint(pt, islandIndex, thresholdPx = (islandInteractionSettings.bodyHitThresholdPx || 8)) {
     const layer = getActiveLayer();
     if (islandIndex < 0 || !layer?.islands?.[islandIndex]) return false;
     const island = layer.islands[islandIndex];
@@ -5138,7 +5395,7 @@
     return -1;
   }
 
-  function hitTestIslandPointHandle(screenX, screenY, idx, radiusPx = islandInteractionSettings.pointHitRadiusPx) {
+  function hitTestIslandPointHandle(screenX, screenY, idx, radiusPx = (islandInteractionSettings.pointHitRadiusPx || 8)) {
     const layer = getActiveLayer();
     if (idx < 0 || !layer.islands[idx]) return -1;
     const island = layer.islands[idx];
@@ -5157,7 +5414,7 @@
     return bestIndex;
   }
 
-  function getPointUnderMouse(screenX, screenY, radiusPx = islandInteractionSettings.pointHitRadiusPx) {
+  function getPointUnderMouse(screenX, screenY, radiusPx = (islandInteractionSettings.pointHitRadiusPx || 8)) {
     const layer = getActiveLayer();
     if (!layer || !Array.isArray(layer.islands)) return null;
     for (let i = layer.islands.length - 1; i >= 0; i--) {
@@ -5176,7 +5433,7 @@
     return islandIndex >= 0 ? islandIndex : null;
   }
 
-  function findIslandPointHandleHit(screenX, screenY, radiusPx = islandInteractionSettings.pointHitRadiusPx) {
+  function findIslandPointHandleHit(screenX, screenY, radiusPx = (islandInteractionSettings.pointHitRadiusPx || 8)) {
     const layer = getActiveLayer();
     if (
       selectedIslandIndex >= 0 &&
@@ -5227,7 +5484,7 @@
     };
   }
 
-  function findIslandEdgeHitAtWorldPoint(pt, islandIndex, thresholdPx = islandInteractionSettings.edgeHitThresholdPx) {
+  function findIslandEdgeHitAtWorldPoint(pt, islandIndex, thresholdPx = (islandInteractionSettings.edgeHitThresholdPx || 8)) {
     const layer = getActiveLayer();
     if (islandIndex < 0 || !layer.islands[islandIndex]) return null;
     const island = layer.islands[islandIndex];
@@ -5256,7 +5513,7 @@
     return bestHit;
   }
 
-  function findIslandEdgeHit(pt, thresholdPx = islandInteractionSettings.edgeHitThresholdPx) {
+  function findIslandEdgeHit(pt, thresholdPx = (islandInteractionSettings.edgeHitThresholdPx || 8)) {
     const layer = getActiveLayer();
     if (
       selectedIslandIndex >= 0 &&
@@ -5828,65 +6085,69 @@
     const baseSize = typeof object.style?.size === 'number' ? object.style.size : 3;
     const highlightWidth = (baseSize + 2) / scale;
 
+    // "Magical Light" Selection Glow
+    ctx.save();
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+    ctx.globalAlpha = 0.6;
+
     if (object.kind === 'air-brush') {
       const particles = object?.geometry?.particles;
-      if (!Array.isArray(particles) || particles.length === 0) return;
-      let sumX = 0;
-      let sumY = 0;
-      for (let i = 0; i < particles.length; i++) {
-        sumX += particles[i].x;
-        sumY += particles[i].y;
+      if (Array.isArray(particles) && particles.length > 0) {
+        let sumX = 0;
+        let sumY = 0;
+        for (let i = 0; i < particles.length; i++) {
+          sumX += particles[i].x;
+          sumY += particles[i].y;
+        }
+        const center = { x: sumX / particles.length, y: sumY / particles.length };
+        let maxDist = 0;
+        for (let i = 0; i < particles.length; i++) {
+          const d = distanceBetweenPoints(center, particles[i]);
+          if (d > maxDist) maxDist = d;
+        }
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.08)';
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = highlightWidth;
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, Math.max(maxDist + highlightWidth * 1.5, highlightWidth * 2), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
       }
-      const center = { x: sumX / particles.length, y: sumY / particles.length };
-      let maxDist = 0;
-      for (let i = 0; i < particles.length; i++) {
-        const d = distanceBetweenPoints(center, particles[i]);
-        if (d > maxDist) maxDist = d;
-      }
-      ctx.fillStyle = 'rgba(0, 255, 255, 0.08)';
+    } else {
       ctx.strokeStyle = '#00ffff';
       ctx.lineWidth = highlightWidth;
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, Math.max(maxDist + highlightWidth * 1.5, highlightWidth * 2), 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      return;
-    }
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
 
-    ctx.strokeStyle = '#00ffff';
-    ctx.lineWidth = highlightWidth;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    if (object.kind === 'stroke') {
-      const points = object?.geometry?.points;
-      if (!Array.isArray(points) || points.length === 0) return;
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
-      ctx.stroke();
-      return;
+      if (object.kind === 'stroke') {
+        const points = object?.geometry?.points;
+        if (Array.isArray(points) && points.length > 0) {
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+          ctx.stroke();
+        }
+      } else if (object.kind === 'line' || object.kind === 'arrow') {
+        const start = object?.geometry?.start;
+        const end = object?.geometry?.end;
+        if (start && end) {
+          ctx.beginPath();
+          ctx.moveTo(start.x, start.y);
+          ctx.lineTo(end.x, end.y);
+          ctx.stroke();
+        }
+      } else if (object.kind === 'point-line') {
+        const nodes = getPointLineNodes(object);
+        if (Array.isArray(nodes) && nodes.length > 0) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[0].x, nodes[0].y);
+          for (let i = 1; i < nodes.length; i++) ctx.lineTo(nodes[i].x, nodes[i].y);
+          ctx.stroke();
+        }
+      }
     }
-
-    if (object.kind === 'line' || object.kind === 'arrow') {
-      const start = object?.geometry?.start;
-      const end = object?.geometry?.end;
-      if (!start || !end) return;
-      ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      ctx.lineTo(end.x, end.y);
-      ctx.stroke();
-      return;
-    }
-
-    if (object.kind === 'point-line') {
-      const nodes = getPointLineNodes(object);
-      if (nodes.length === 0) return;
-      ctx.beginPath();
-      ctx.moveTo(nodes[0].x, nodes[0].y);
-      for (let i = 1; i < nodes.length; i++) ctx.lineTo(nodes[i].x, nodes[i].y);
-      ctx.stroke();
-    }
+    ctx.restore();
   }
 
   function selectSceneObjectAtWorldPoint(pt) {
@@ -5913,6 +6174,7 @@
     if (nextObjectId) {
       return setSelectedObject(nextObjectId, nextLayerId, { skipRender: true });
     }
+    // Clear selection if clicking empty space
     return clearSelection({ skipRender: true });
   }
 
@@ -8038,7 +8300,7 @@
   const sideMenu = document.getElementById('sideMenu');
   const closeSideMenu = document.getElementById('closeSideMenu');
   const sideGridToggleBtn = document.getElementById('sideGridToggleBtn');
-  const sideExportBtn = document.getElementById('sideExportBtn');
+  const sideDownloadBtn = document.getElementById('sideDownloadBtn');
   const sideTutorialBtn = document.getElementById('sideTutorialBtn');
   const sideKeybindsBtn = document.getElementById('sideKeybindsBtn');
   const sideAboutBtn = document.getElementById('sideAboutBtn');
@@ -8071,7 +8333,7 @@
       sideMenu.classList.remove('open');
     };
   }
-  if (sideExportBtn) sideExportBtn.onclick = () => { exportCanvasPng(); sideMenu.classList.remove('open'); };
+  if (sideDownloadBtn) sideDownloadBtn.onclick = () => { downloadCanvasPng(); sideMenu.classList.remove('open'); };
   if (sideTutorialBtn) sideTutorialBtn.onclick = () => { window.open('tutorial.html', '_blank'); sideMenu.classList.remove('open'); };
   if (sideKeybindsBtn) sideKeybindsBtn.onclick = () => { sideMenu.classList.remove('open'); openSettings('shortcuts'); };
   if (sideAboutBtn) sideAboutBtn.onclick = () => {
@@ -8118,10 +8380,12 @@
   const settingsEditProfileTab = document.getElementById('settingsEditProfileTab');
   const settingsShortcutsTab = document.getElementById('settingsShortcutsTab');
   const settingsToolUsageTab = document.getElementById('settingsToolUsageTab');
+  const settingsUxConfigTab = document.getElementById('settingsUxConfigTab');
   const settingsCreateAccountForm = document.getElementById('settingsCreateAccountForm');
   const settingsEditProfileForm = document.getElementById('settingsEditProfileForm');
   const settingsShortcuts = document.getElementById('settingsShortcuts');
   const settingsToolUsage = document.getElementById('settingsToolUsage');
+  const settingsUxConfig = document.getElementById('settingsUxConfig');
   const settingsNotice = document.getElementById('settingsNotice');
   const profilePreview = document.getElementById('profilePreview');
   const profileImageInput = document.getElementById('profileImageInput');
@@ -8146,6 +8410,7 @@
   if (settingsEditProfileTab) settingsEditProfileTab.onclick = () => switchTab('edit');
   if (settingsShortcutsTab) settingsShortcutsTab.onclick = () => switchTab('shortcuts');
   if (settingsToolUsageTab) settingsToolUsageTab.onclick = () => switchTab('toolusage');
+  if (settingsUxConfigTab) settingsUxConfigTab.onclick = () => switchTab('uxconfig');
   if (profileImageInput) profileImageInput.onchange = function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -8407,7 +8672,8 @@
     settingsModal.style.display = 'flex';
     refreshSettingsTabsVisibility();
     const requestedTab = typeof tab === 'string' ? tab : '';
-    if (requestedTab === 'shortcuts' || requestedTab === 'toolusage' || requestedTab === 'create' || requestedTab === 'edit') {
+    const validTabs = ['shortcuts', 'toolusage', 'create', 'edit', 'uxconfig'];
+    if (validTabs.includes(requestedTab)) {
       switchTab(requestedTab);
     } else {
       const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -8433,6 +8699,7 @@
     if (settingsEditProfileForm) settingsEditProfileForm.style.display = 'none';
     if (settingsShortcuts) settingsShortcuts.style.display = 'none';
     if (settingsToolUsage) settingsToolUsage.style.display = 'none';
+    if (settingsUxConfig) settingsUxConfig.style.display = 'none';
 
     // Show selected
     if (tab === 'create') {
@@ -8443,7 +8710,32 @@
       if (settingsShortcuts) settingsShortcuts.style.display = '';
     } else if (tab === 'toolusage') {
       if (settingsToolUsage) settingsToolUsage.style.display = '';
+    } else if (tab === 'uxconfig') {
+      if (settingsUxConfig) settingsUxConfig.style.display = '';
+      initializeUxSliders();
     }
+  }
+
+  function initializeUxSliders() {
+    const sliders = document.querySelectorAll('.ux-slider');
+    sliders.forEach(slider => {
+      const varName = slider.dataset.var;
+      slider.value = islandInteractionSettings[varName];
+      const displayId = {
+        pointHitRadiusPx: 'val_pointHit',
+        edgeHitThresholdPx: 'val_edgeHit',
+        closeRadiusPx: 'val_snapDist',
+        freehandPointSpacingPx: 'val_spacing'
+      }[varName];
+      const display = document.getElementById(displayId);
+      if (display) display.textContent = slider.value;
+
+      slider.oninput = (e) => {
+        const val = parseInt(e.target.value);
+        islandInteractionSettings[varName] = val;
+        if (display) display.textContent = val;
+      };
+    });
   }
 
   function preloadProfileFromStorage() {
