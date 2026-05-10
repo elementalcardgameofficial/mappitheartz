@@ -1,0 +1,14 @@
+[build]
+  publish = "."
+
+# Login route
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+# SPA catch-all — always serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
