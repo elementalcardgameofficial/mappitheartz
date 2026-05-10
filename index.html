@@ -24,6 +24,8 @@
       );
       min-height: 100vh;
       color: var(--text-color);
+      position: relative;
+      overflow-x: hidden;
     }
     #welcomeBar {
       width: 100%;
@@ -72,32 +74,154 @@
     }
     
     #topStars {
-      position: fixed;
-      top: 0;
+      position: absolute;
+      bottom: 0;
       left: 0;
-      height: 20vh;
+      height: 420px;
       width: 100%;
       pointer-events: none;
       overflow: hidden;
       z-index: 0;
+      background:
+        radial-gradient(circle at 50% 112%, rgba(255, 255, 255, 0.82) 0 6%, rgba(255, 255, 255, 0.3) 19%, transparent 46%),
+        linear-gradient(to top, rgba(105, 113, 126, 0.36), rgba(169, 178, 188, 0.18) 52%, transparent 100%);
+    }
+
+    #topStars::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -10%;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.28) 32%, rgba(255,255,255,0) 72%);
+      animation: bottomPulse 5.8s ease-in-out infinite;
+    }
+
+    .bottom-star {
+      position: absolute;
+      left: 50%;
+      bottom: -52px;
+      width: 112px;
+      height: 112px;
+      background: #ffffff;
+      clip-path: polygon(50% 0%, 58% 35%, 78% 22%, 65% 42%, 100% 50%, 65% 58%, 78% 78%, 58% 65%, 50% 100%, 42% 65%, 22% 78%, 35% 58%, 0% 50%, 35% 42%, 22% 22%, 42% 35%);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.96)) drop-shadow(0 0 22px rgba(255, 255, 255, 0.55));
+      opacity: 0.95;
+      transform-origin: 50% 50%;
+      animation: bottomStarRotate 10s linear infinite;
+    }
+
+    .bottom-rays {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+    }
+
+    .bottom-rays .ray-glow {
+      fill: url(#rayGlow);
+      stroke: none;
+      filter: drop-shadow(0 0 9px rgba(255, 255, 255, 0.34));
+      transform-origin: 50% 100%;
+      animation: rayDream 10s ease-in-out infinite;
+    }
+
+    .bottom-rays .ray-bone {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.34);
+      stroke-width: 0.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.28));
+      animation: rayDream 10s ease-in-out infinite;
+    }
+
+    .bottom-rays .ray-bone {
+      stroke-dasharray: 7 12;
+    }
+
+    .bottom-rays path:nth-child(3n) {
+      animation-delay: -4.6s;
+    }
+
+    .silver-wing-fence {
+      position: absolute;
+      left: 0;
+      bottom: 12px;
+      width: 100%;
+      height: 190px;
+      opacity: 0.92;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.34));
+    }
+
+    .silver-wing-fence .fence-rail {
+      fill: none;
+      stroke: rgba(207, 215, 225, 0.74);
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .silver-wing-fence .fence-picket {
+      fill: none;
+      stroke: rgba(184, 194, 207, 0.72);
+      stroke-width: 1.05;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .silver-wing-fence .fence-highlight {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.82);
+      stroke-width: 0.55;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
     }
     
     .star {
       position: absolute;
-      width: 3px;
-      height: 3px;
+      width: var(--star-size, 6px);
+      height: var(--star-size, 6px);
       background: white;
       border-radius: 50%;
       opacity: 0;
-      box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
-      animation: sparkle 2.4s ease-out forwards;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.88), 0 0 2px rgba(60, 64, 70, 0.22);
+      animation: sparkle 6s ease-in-out forwards;
+    }
+
+    .star.star-shape {
+      width: 14px;
+      height: 14px;
+      border-radius: 0;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 35%);
     }
     
     @keyframes sparkle {
-      0% { opacity: 0; transform: scale(0.2); }
-      20% { opacity: 1; transform: scale(1); }
-      70% { opacity: 0.7; transform: scale(1.2); }
-      100% { opacity: 0; transform: scale(0.3); }
+      0% { opacity: 0; transform: translateY(12px) scale(0.45); }
+      20% { opacity: 0.78; transform: translateY(2px) scale(1); }
+      68% { opacity: 0.55; transform: translateY(-18px) scale(1.16); }
+      100% { opacity: 0; transform: translateY(-34px) scale(0.62); }
+    }
+
+    @keyframes bottomPulse {
+      0%, 100% { opacity: 0.42; transform: translateX(-50%) scale(0.82); }
+      50% { opacity: 0.9; transform: translateX(-50%) scale(1.12); }
+    }
+
+    @keyframes bottomStarRotate {
+      from { transform: translateX(-50%) rotate(0deg); }
+      to { transform: translateX(-50%) rotate(360deg); }
+    }
+
+    @keyframes rayDream {
+      0%, 100% { opacity: 0.26; transform: translateY(4px) skewX(-1deg); }
+      50% { opacity: 0.78; transform: translateY(-6px) skewX(1.5deg); }
     }
     #commandBar {
       background: #ffffff;
@@ -195,9 +319,11 @@
       gap: 24px;
       width: 100vw;
       max-width: 100vw;
-      margin: 0 0 32px 0;
-      padding: 0 0 0 0;
+      margin: 0 0 0 0;
+      padding: 0 0 360px 0;
       box-sizing: border-box;
+      position: relative;
+      z-index: 2;
     }
     .fileBox {
       background: #ffffff;
@@ -449,6 +575,16 @@
       z-index: 2300;
     }
 
+    body.entrance-mode #topContainer {
+      height: auto;
+      min-height: 100vh;
+    }
+
+    body.app-mode #topContainer {
+      height: 0;
+      min-height: 0;
+    }
+
     #topContainer > * {
       pointer-events: auto;
     }
@@ -536,79 +672,6 @@
       background: #666;
     }
 
-    /* Account modal styles */
-    #accountModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-    }
-    #accountModal > div {
-      background: #fff;
-      padding: 32px 24px;
-      border-radius: 12px;
-      min-width: 320px;
-      box-shadow: 0 4px 24px #0004;
-      position: relative;
-    }
-    #closeAccountModal {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      font-size: 1.5em;
-      cursor: pointer;
-    }
-    #accountModalTitle {
-      margin: 0 0 16px 0;
-      font-size: 1.8em;
-      text-align: center;
-    }
-    #loginForm, #registerForm {
-      display: block;
-      margin: 0;
-    }
-    #loginForm input, #registerForm input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #loginForm button, #registerForm button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 4px;
-      background: #4285F4;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    #loginForm button:hover, #registerForm button:hover {
-      background: #357ae8;
-    }
-    #showRegisterBtn {
-      background: none;
-      border: none;
-      color: #4285F4;
-      cursor: pointer;
-      padding: 0;
-      font-size: 1em;
-    }
-    #accountError {
-      color: red;
-      text-align: center;
-      margin-top: 8px;
-    }
     /* Circular progress bar styles */
     .circular-progress {
       position: relative;
@@ -1606,8 +1669,49 @@
   </style>
 <style type="text/css" id="operaUserStyle"></style></head>
 <body>
-  <div id="topStars"></div>
-  <span id="userInfo" style="display:none; margin: 10px auto; text-align:center;"></span>
+  <div id="topStars" aria-hidden="true">
+    <svg class="bottom-rays" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="rayGlow" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0"></stop>
+          <stop offset="44%" stop-color="#ffffff" stop-opacity="0.18"></stop>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.42"></stop>
+        </linearGradient>
+      </defs>
+      <path class="ray-glow" d="M8 108 C10 88 12 70 17 52 C20 40 20 30 22 18 C25 32 24 44 27 57 C31 76 28 91 28 108 Z"></path>
+      <path class="ray-glow" d="M23 108 C23 85 28 73 31 58 C34 45 35 34 33 22 C40 39 39 51 43 66 C47 82 44 95 45 108 Z"></path>
+      <path class="ray-glow" d="M42 108 C43 89 40 75 45 60 C48 49 51 37 51 25 C57 42 55 54 59 70 C62 85 62 96 64 108 Z"></path>
+      <path class="ray-glow" d="M61 108 C62 88 67 75 70 60 C72 49 74 39 80 26 C80 43 84 56 87 70 C91 86 88 97 90 108 Z"></path>
+      <path class="ray-glow" d="M74 108 C78 88 82 77 88 64 C92 53 94 46 96 35 C100 52 99 65 101 79 C103 91 104 100 106 108 Z"></path>
+      <path class="ray-bone" d="M18 108 C18 84 20 68 22 18"></path>
+      <path class="ray-bone" d="M34 108 C34 84 38 62 33 22"></path>
+      <path class="ray-bone" d="M53 108 C51 83 56 60 51 25"></path>
+      <path class="ray-bone" d="M78 108 C77 86 81 58 80 26"></path>
+      <path class="ray-bone" d="M91 108 C94 85 97 62 96 35"></path>
+    </svg>
+    <svg class="silver-wing-fence" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path class="fence-rail" d="M50 94 C40 78 27 67 5 58"></path>
+      <path class="fence-rail" d="M50 94 C60 78 73 67 95 58"></path>
+      <path class="fence-rail fence-highlight" d="M50 88 C39 74 25 63 8 55"></path>
+      <path class="fence-rail fence-highlight" d="M50 88 C61 74 75 63 92 55"></path>
+      <path class="fence-picket" d="M8 92 C9 80 9 68 8 55"></path>
+      <path class="fence-picket" d="M16 96 C17 80 17 65 16 47"></path>
+      <path class="fence-picket" d="M24 98 C25 78 25 60 24 40"></path>
+      <path class="fence-picket" d="M32 99 C33 80 33 61 32 43"></path>
+      <path class="fence-picket" d="M40 99 C41 84 41 70 40 55"></path>
+      <path class="fence-picket" d="M60 99 C59 84 59 70 60 55"></path>
+      <path class="fence-picket" d="M68 99 C67 80 67 61 68 43"></path>
+      <path class="fence-picket" d="M76 98 C75 78 75 60 76 40"></path>
+      <path class="fence-picket" d="M84 96 C83 80 83 65 84 47"></path>
+      <path class="fence-picket" d="M92 92 C91 80 91 68 92 55"></path>
+      <path class="fence-highlight" d="M16 50 C17 49 18 48 19 47"></path>
+      <path class="fence-highlight" d="M24 43 C25 42 26 41 27 40"></path>
+      <path class="fence-highlight" d="M76 43 C75 42 74 41 73 40"></path>
+      <path class="fence-highlight" d="M84 50 C83 49 82 48 81 47"></path>
+    </svg>
+    <div class="bottom-star"></div>
+  </div>
+  <span id="userInfo" style="display:none; margin: 10px auto; text-align:center; color:#222; font-weight:700;"></span>
 
   <div id="topContainer">
   <input type="text" id="commandBar" placeholder="Search tools or type / for commands...">
@@ -1619,7 +1723,7 @@
     </div>
     <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
       <button id="settingsBtn">Settings</button>
-      <button id="customLoginBtn">Login</button>
+      <button id="customLoginBtn" type="button">Login</button>
     </div>
   </div>
   <div id="welcomeButtons" style="display: none;">
@@ -1858,53 +1962,6 @@
   </div>
   <button id="toolsBarTab" class="bar-tab right" title="Show Inspector">◂</button>
 
-  <div id="accountModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:3000;align-items:center;justify-content:center;">
-    <div style="background:#fff;padding:32px 24px;border-radius:12px;min-width:320px;box-shadow:0 4px 24px #0004;position:relative;">
-      <button id="closeAccountModal" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.5em;cursor:pointer;">Ã—</button>
-      <h2 id="accountModalTitle">Login</h2>
-      <form id="loginForm">
-        <input type="text" id="loginFirstName" placeholder="First Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        <input type="text" id="loginLastName" placeholder="Last Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        <input type="password" id="loginPassword" placeholder="Password" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;">Login</button>
-      </form>
-      <div style="text-align:center;">
-        <span>Don't have an account?</span>
-        <button id="showRegisterBtn" style="background:none;border:none;color:#4285F4;cursor:pointer;">Create one</button>
-      </div>
-      <form id="registerForm" style="display:none;margin-top:16px;">
-        <input type="text" id="registerFirstName" placeholder="First Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        <input type="text" id="registerLastName" placeholder="Last Name" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        <input type="password" id="registerPassword" placeholder="Password" required="" style="width:100%;margin-bottom:10px;padding:8px;">
-        
-        <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Objective:</label>
-        <select id="registerObjective" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
-          <option value="">Select your objective</option>
-          <option value="gaming-maps">Gaming Maps</option>
-          <option value="personal-reasons">Personal Reasons</option>
-          <option value="educational">Educational Purposes</option>
-          <option value="business">Business Planning</option>
-          <option value="travel">Travel Planning</option>
-          <option value="research">Research &amp; Analysis</option>
-          <option value="creative">Creative Projects</option>
-          <option value="other">Other</option>
-        </select>
-        
-        <label style="display:block;margin:10px 0 5px 0;font-weight:bold;color:#333;">Preferred Map Type:</label>
-        <select id="registerMapType" required="" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #ccc;border-radius:4px;">
-          <option value="">Select your preferred map type</option>
-          <option value="physical-maps">Physical Maps</option>
-          <option value="general-maps">General Maps</option>
-          <option value="celestial-maps">Celestial Maps</option>
-        </select>
-        
-        <button type="submit" style="width:100%;padding:10px;margin-bottom:10px;">Create Account</button>
-      </form>
-      <div id="accountError" style="color:red;text-align:center;margin-top:8px;"></div>
-    </div>
-  </div>
-
-
   <button id="menuBtn" title="Menu" style="position: fixed; top: 0px; left: 0px; z-index: 2002; width: 60px; height: 60px; background: rgb(51, 51, 51); color: white; border: none; border-radius: 0px 0px 12px; cursor: pointer; display: none; transition: background 0.2s; justify-content: center; align-items: center;">
     <span class="menu-icon">
       <span></span>
@@ -2097,6 +2154,8 @@
     <button id="deletePlanetCrop" style="width:100%;padding:6px;background:#d32f2f;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">Delete</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-config.js"></script>
   <script>
   // App bootstrap
 
@@ -2963,20 +3022,26 @@
     if (!container) return;
     const star = document.createElement("div");
     star.classList.add("star");
+    if (Math.random() > 0.9) {
+      star.classList.add("star-shape");
+    }
+    const size = 3 + Math.random() * 7;
     
-    // random horizontal position
+    // Random position inside the bottom decorative shade.
     star.style.left = Math.random() * 100 + "%";
+    star.style.top = (10 + Math.random() * 76) + "%";
+    star.style.setProperty("--star-size", size.toFixed(1) + "px");
     
-    // random delay
-    star.style.animationDuration = (1.6 + Math.random() * 1.4) + "s";
+    const duration = 5.5 + Math.random() * 4.5;
+    star.style.animationDuration = duration.toFixed(2) + "s";
     
     container.appendChild(star);
     
-    setTimeout(() => star.remove(), 2500);
+    setTimeout(() => star.remove(), (duration * 1000) + 500);
   }
   
   window.onload = function() {
-    setInterval(spawnStar, 200 + Math.random() * 400);
+    setInterval(spawnStar, 120);
     // Initialize internet connectivity detection
     checkInternetConnection();
   // --- Welcome Banner Logic ---
@@ -3004,6 +3069,8 @@
   });
   let visited = localStorage.getItem('visited');
   let currentFileIndex = null;
+  document.body.classList.add('entrance-mode');
+  document.body.classList.remove('app-mode');
 
   // Welcome message
   if (!visited) {
@@ -3053,7 +3120,7 @@
       files.push(testFile);
     }
     
-    for (let i = 0; i < Math.min(files.length, 9); i++) {
+    for (let i = 0; i < files.length; i++) {
       const container = document.createElement('div');
       container.className = 'fileContainer';
       
@@ -3145,20 +3212,17 @@
       container.appendChild(fileInfo);
       recentFilesGrid.appendChild(container);
     }
-    // Add "+" box if less than 9 files
-    if (files.length < 9) {
-      const addContainer = document.createElement('div');
-      addContainer.className = 'fileContainer';
-      
-      const addBox = document.createElement('div');
-      addBox.className = 'addBox';
-      addBox.innerHTML = '+';
-      addBox.title = "Create new file";
-      addBox.onclick = () => startNewFile();
-      
-      addContainer.appendChild(addBox);
-      recentFilesGrid.appendChild(addContainer);
-    }
+    const addContainer = document.createElement('div');
+    addContainer.className = 'fileContainer';
+    
+    const addBox = document.createElement('div');
+    addBox.className = 'addBox';
+    addBox.innerHTML = '+';
+    addBox.title = "Create new file";
+    addBox.onclick = () => startNewFile();
+    
+    addContainer.appendChild(addBox);
+    recentFilesGrid.appendChild(addContainer);
   }
 
   renderRecentFiles();
@@ -3170,7 +3234,7 @@
   const loginBtn = document.getElementById('loginBtn');
   
   if (welcomeTopSettingsBtn) welcomeTopSettingsBtn.onclick = () => openSettings();
-  if (loginBtn) loginBtn.onclick = () => accountModal.style.display = 'flex';
+  if (loginBtn) loginBtn.onclick = () => { window.location.href = 'login.html'; };
   
   // Command bar functionality
   const toolMap = {
@@ -4135,6 +4199,8 @@
   // --- Show main app ---
   function showApp() {
     closeLayerContextMenu();
+    document.body.classList.add('app-mode');
+    document.body.classList.remove('entrance-mode');
     document.getElementById('welcomeBanner').style.display = 'none';
     document.getElementById('welcomeButtons').style.display = 'none';
     document.getElementById('recentFilesGrid').style.display = 'none';
@@ -4173,6 +4239,8 @@
   // --- Show entrance menu ---
   function showEntranceMenu() {
     closeLayerContextMenu();
+    document.body.classList.add('entrance-mode');
+    document.body.classList.remove('app-mode');
     welcomeBanner.style.display = 'block';
     document.getElementById('welcomeBar').style.display = 'flex';
     const topStarsEl = document.getElementById('topStars');
@@ -8079,17 +8147,11 @@
     sideMenu.classList.remove('open');
   };
 
-  // Account modal logic
-  const accountModal = document.getElementById('accountModal');
+  // Account/login page logic
   const customLoginBtn = document.getElementById('customLoginBtn');
   const settingsBtn = document.getElementById('settingsBtn');
   const userAvatar = document.getElementById('userAvatar');
-  const closeAccountModal = document.getElementById('closeAccountModal');
-  const showRegisterBtn = document.getElementById('showRegisterBtn');
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  const accountModalTitle = document.getElementById('accountModalTitle');
-  const accountError = document.getElementById('accountError');
+  const userInfo = document.getElementById('userInfo');
   
   // Hash password with SHA-256 before storing/comparing to avoid plaintext hardcoded credentials
   async function hashPassword(password) {
@@ -8108,6 +8170,43 @@
       for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
       return 'weak-' + (h >>> 0).toString(16);
     }
+  }
+
+  const mappitAuthConfig = window.MAPPIT_AUTH || {};
+  const mappitSupabaseReady = mappitAuthConfig.supabaseUrl && mappitAuthConfig.supabaseAnonKey && !mappitAuthConfig.supabaseAnonKey.includes('PASTE_');
+  const mappitSupabase = mappitSupabaseReady && window.supabase ? window.supabase.createClient(mappitAuthConfig.supabaseUrl, mappitAuthConfig.supabaseAnonKey) : null;
+
+  function normalizeAuthUser(user, profile) {
+    const metadata = user.user_metadata || {};
+    const fullName = (profile && profile.full_name) || metadata.full_name || metadata.name || user.email || 'mapit user';
+    return {
+      id: user.id,
+      email: user.email || '',
+      full_name: fullName,
+      firstName: fullName.split(' ')[0] || 'mapit',
+      lastName: fullName.split(' ').slice(1).join(' '),
+      avatar_url: (profile && profile.avatar_url) || metadata.avatar_url || metadata.picture || '',
+      profileImage: (profile && profile.avatar_url) || metadata.avatar_url || metadata.picture || '',
+      provider: (profile && profile.provider) || ((user.identities && user.identities[0] && user.identities[0].provider) || 'email'),
+      objective: (profile && profile.objective) || '',
+      mapType: (profile && profile.map_type) || ''
+    };
+  }
+
+  async function loadSupabaseUser() {
+    if (!mappitSupabase) return;
+    const { data: sessionData } = await mappitSupabase.auth.getSession();
+    const sessionUser = sessionData && sessionData.session && sessionData.session.user;
+    if (!sessionUser) return;
+
+    const { data: profile } = await mappitSupabase
+      .from('user_profiles')
+      .select('full_name, avatar_url, provider, objective, map_type')
+      .eq('id', sessionUser.id)
+      .maybeSingle();
+
+    setCurrentUser(normalizeAuthUser(sessionUser, profile));
+    updateAuthUI();
   }
 
   // Settings modal refs
@@ -8131,18 +8230,12 @@
   const editConfirmPassword = document.getElementById('editConfirmPassword');
 
   // Event handlers for settings modal
-  if (customLoginBtn) customLoginBtn.onclick = () => accountModal.style.display = 'flex';
+  if (customLoginBtn) customLoginBtn.onclick = () => { window.location.href = 'login.html'; };
   if (settingsBtn) settingsBtn.onclick = () => openSettings();
   if (sideSettingsBtn) sideSettingsBtn.onclick = () => { sideMenu.classList.remove('open'); openSettings(); };
   if (userAvatar) userAvatar.onclick = () => openSettings('edit');
-  if (closeAccountModal) closeAccountModal.onclick = () => accountModal.style.display = 'none';
   if (closeSettingsModal) closeSettingsModal.onclick = () => closeSettings();
-  if (showRegisterBtn) showRegisterBtn.onclick = () => {
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'block';
-    accountModalTitle.textContent = 'Create Account';
-  };
-  if (settingsCreateAccountTab) settingsCreateAccountTab.onclick = () => switchTab('create');
+  if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = 'none';
   if (settingsEditProfileTab) settingsEditProfileTab.onclick = () => switchTab('edit');
   if (settingsShortcutsTab) settingsShortcutsTab.onclick = () => switchTab('shortcuts');
   if (settingsToolUsageTab) settingsToolUsageTab.onclick = () => switchTab('toolusage');
@@ -8307,55 +8400,6 @@
     if (profileImageInput) profileImageInput.value = '';
   });
 
-  // Register logic (single secure handler)
-  registerForm.onsubmit = async function(e) {
-    e.preventDefault();
-    const firstName = document.getElementById('registerFirstName').value.trim();
-    const lastName = document.getElementById('registerLastName').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const objective = document.getElementById('registerObjective').value;
-    const mapType = document.getElementById('registerMapType').value;
-    
-    if (!firstName || !lastName || !password || !objective || !mapType) {
-      accountError.textContent = "Please complete all required fields.";
-      return;
-    }
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    if (users.find(u => u.firstName === firstName && u.lastName === lastName)) {
-      accountError.textContent = "Registration failed. Please try different information.";
-      return;
-    }
-    const hashed = await hashPassword(password);
-    const newUser = { firstName, lastName, password: hashed, objective, mapType, profileImage: profilePreview.src || null };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    setCurrentUser(newUser);
-    accountError.textContent = "Account created!";
-    accountModal.style.display = 'none';
-    updateAuthUI();
-    // Open settings to Profile view
-    openSettings('edit');
-  };
-
-  // Login logic (single secure handler)
-  loginForm.onsubmit = async function(e) {
-    e.preventDefault();
-    const firstName = document.getElementById('loginFirstName').value.trim();
-    const lastName = document.getElementById('loginLastName').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const hashed = await hashPassword(password);
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.firstName === firstName && u.lastName === lastName && u.password === hashed);
-    if (user) {
-      accountModal.style.display = 'none';
-      accountError.textContent = '';
-      setCurrentUser(user);
-      updateAuthUI();
-    } else {
-      accountError.textContent = "Login failed. Please check your information.";
-    }
-  };
-
   // Settings modal logic
   function getCurrentUser() {
     try {
@@ -8377,45 +8421,44 @@
     const currentUser = getCurrentUser();
     if (currentUser) {
       if (customLoginBtn) customLoginBtn.style.display = 'none';
+      if (userInfo) {
+        const displayName = currentUser.full_name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.email || 'mapit user';
+        userInfo.textContent = `Signed in as ${displayName}`;
+        userInfo.style.display = 'block';
+      }
       if (userAvatar) {
-        userAvatar.src = currentUser.profileImage || getDefaultAvatarDataUrl();
-        userAvatar.title = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+        userAvatar.src = currentUser.profileImage || currentUser.avatar_url || getDefaultAvatarDataUrl();
+        userAvatar.title = currentUser.full_name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
         userAvatar.style.display = '';
       }
     } else {
+      if (userInfo) {
+        userInfo.textContent = '';
+        userInfo.style.display = 'none';
+      }
       if (userAvatar) userAvatar.style.display = 'none';
       if (customLoginBtn) customLoginBtn.style.display = 'block';
     }
   }
 
   function refreshSettingsTabsVisibility() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const hasAnyUser = users.length > 0;
     const currentUser = getCurrentUser();
-    const shouldShowProfileOnly = hasAnyUser || !!currentUser;
-
-    if (shouldShowProfileOnly) {
-      if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = 'none';
-      if (settingsEditProfileTab) settingsEditProfileTab.style.display = '';
-    } else {
-      if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = '';
-      if (settingsEditProfileTab) settingsEditProfileTab.style.display = 'none';
-    }
+    if (settingsCreateAccountTab) settingsCreateAccountTab.style.display = 'none';
+    if (settingsEditProfileTab) settingsEditProfileTab.style.display = currentUser ? '' : 'none';
   }
 
   function openSettings(tab) {
     settingsModal.style.display = 'flex';
     refreshSettingsTabsVisibility();
     const requestedTab = typeof tab === 'string' ? tab : '';
-    if (requestedTab === 'shortcuts' || requestedTab === 'toolusage' || requestedTab === 'create' || requestedTab === 'edit') {
+    if (requestedTab === 'shortcuts' || requestedTab === 'toolusage' || requestedTab === 'edit') {
       switchTab(requestedTab);
     } else {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const hasAnyUser = users.length > 0 || !!getCurrentUser();
+      const hasAnyUser = !!getCurrentUser();
       if (hasAnyUser) {
         switchTab('edit');
       } else {
-        switchTab('create');
+        switchTab('shortcuts');
       }
     }
     preloadProfileFromStorage();
@@ -8435,9 +8478,7 @@
     if (settingsToolUsage) settingsToolUsage.style.display = 'none';
 
     // Show selected
-    if (tab === 'create') {
-      if (settingsCreateAccountForm) settingsCreateAccountForm.style.display = '';
-    } else if (tab === 'edit') {
+    if (tab === 'edit') {
       if (settingsEditProfileForm) settingsEditProfileForm.style.display = '';
     } else if (tab === 'shortcuts') {
       if (settingsShortcuts) settingsShortcuts.style.display = '';
@@ -8544,6 +8585,46 @@
       if (!current) {
         settingsNotice.textContent = 'No matching user found. Please create an account first.';
         settingsNotice.style.display = 'block';
+        return;
+      }
+
+      if (current.id && mappitSupabase) {
+        const fullName = `${newFirst || current.firstName || ''} ${newLast || current.lastName || ''}`.trim() || current.full_name || current.email || 'mapit user';
+        const updated = {
+          ...current,
+          full_name: fullName,
+          firstName: newFirst || current.firstName || '',
+          lastName: newLast || current.lastName || '',
+          objective: newObjective || current.objective || '',
+          mapType: newMapType || current.mapType || '',
+          profileImage: profilePreview.src || current.profileImage || current.avatar_url || '',
+          avatar_url: profilePreview.src || current.avatar_url || current.profileImage || ''
+        };
+
+        const { error } = await mappitSupabase
+          .from('user_profiles')
+          .upsert({
+            id: current.id,
+            email: current.email || '',
+            full_name: updated.full_name,
+            avatar_url: updated.avatar_url,
+            provider: updated.provider || '',
+            objective: updated.objective,
+            map_type: updated.mapType
+          }, { onConflict: 'id' });
+
+        if (error) {
+          settingsNotice.textContent = 'Profile could not be saved right now.';
+          settingsNotice.style.display = 'block';
+          return;
+        }
+
+        setCurrentUser(updated);
+        editNewPassword.value = '';
+        editConfirmPassword.value = '';
+        settingsNotice.textContent = 'Profile updated.';
+        settingsNotice.style.display = 'block';
+        updateAuthUI();
         return;
       }
 
@@ -8694,6 +8775,7 @@
 
   // Initialize the app
   updateAuthUI();
+  loadSupabaseUser().catch((error) => console.warn('Could not load Supabase profile:', error));
 
   // Make planet panel draggable
   (function makePanelDraggable() {
