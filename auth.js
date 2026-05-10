@@ -1,59 +1,84 @@
-// auth.js — Mappit Heartz GitHub OAuth via Supabase
-// Reads config from auth-config.js (window.MAPPIT_AUTH)
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+(function () {
+  function setAuthStatus(message, isError = false) {
+    const authStatus = document.getElementById("authStatus");
+    if (!authStatus) return;
+    authStatus.textContent = message;
+    authStatus.className = isError ? "error" : "";
+  }
 
-const { supabaseUrl, supabaseAnonKey } = window.MAPPIT_AUTH;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  function getRedirectUrl() {
+    return new URL("login.html", window.location.href).href;
+  }
 
-// GitHub Login
-async function loginWithGitHub() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "github",
-    options: {
-      redirectTo: "https://mappithtml.netlify.app/index.html"
+  function createSupabaseClient() {
+    if (!window.supabase || !window.supabase.createClient) {
+      setAuthStatus("Supabase library did not load.", true);
+      return null;
     }
-  });
-  if (error) console.error("Login error:", error.message);
-}
 
-// Logout
-async function logout() {
-  const { error } = await supabase.auth.signOut();
-  if (error) console.error("Logout error:", error.message);
-  window.location.href = "/login.html";
-}
+    const config = window.MAPPIT_AUTH || {};
 
-// Check session on page load
-async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    // User is logged in
-    const user = session.user;
-    const avatar = document.getElementById("user-avatar");
-    const username = document.getElementById("user-name");
-    const logoutBtn = document.getElementById("logout-btn");
-    const loginBtn = document.getElementById("login-btn");
+    return window.supabase.createClient(
+      config.supabaseUrl,
+      config.supabaseAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+  }
 
-    if (avatar) avatar.src = user.user_metadata.avatar_url || "";
-    if (username) username.textContent = user.user_metadata.user_name || user.email;
-    if (logoutBtn) logoutBtn.style.display = "block";
-    if (loginBtn) loginBtn.style.display = "none";
+  async function checkActiveSession(supabaseClient) {
+    const { data, error } = await supabaseClient.auth.getSession();
 
-    // If on login page and already logged in → go to app
-    if (window.location.pathname.includes("login")) {
-      window.location.href = "/index.html";
+    if (error) {
+      setAuthStatus(error.message, true);
+      return;
     }
-  } else {
-    // Not logged in — if on index, send to login
-    if (!window.location.pathname.includes("login")) {
-      window.location.href = "/login.html";
+
+    if (data.session) {
+      window.location.href = "index.html";
     }
   }
-}
 
-// Expose functions globally
-window.loginWithGitHub = loginWithGitHub;
-window.logout = logout;
+  async function signInWithProvider(supabaseClient, provider) {
+    setAuthStatus("Opening sign in...");
 
-// Run on load
-checkSession();
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: getRedirectUrl(),
+        scopes: provider === "github" ? "read:user user:email" : undefined
+      }
+    });
+
+    if (error) {
+      setAuthStatus(error.message, true);
+    }
+  }
+
+  function initAuth() {
+    const supabaseClient = createSupabaseClient();
+
+    if (!supabaseClient) return;
+
+    document
+      .getElementById("googleLoginBtn")
+      .addEventListener("click", () => signInWithProvider(supabaseClient, "google"));
+
+    document
+      .getElementById("githubLoginBtn")
+      .addEventListener("click", () => signInWithProvider(supabaseClient, "github"));
+
+    checkActiveSession(supabaseClient);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAuth);
+  } else {
+    initAuth();
+  }
+})();
