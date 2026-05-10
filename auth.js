@@ -1,4 +1,17 @@
 (function () {
+  const fallbackConfig = {
+    supabaseUrl: "https://mxzwtwhirpnccerrijrb.supabase.co",
+    supabaseAnonKey: "sb_publishable_lra0O9LFM2hz-9ZIoEio8A_GH39JBya"
+  };
+
+  function getConfig() {
+    const config = window.MAPPIT_AUTH || {};
+    return {
+      supabaseUrl: config.supabaseUrl || fallbackConfig.supabaseUrl,
+      supabaseAnonKey: config.supabaseAnonKey || fallbackConfig.supabaseAnonKey
+    };
+  }
+
   function setAuthStatus(message, isError = false) {
     const authStatus = document.getElementById("authStatus");
     if (!authStatus) return;
@@ -12,23 +25,24 @@
 
   function createSupabaseClient() {
     if (!window.supabase || !window.supabase.createClient) {
-      setAuthStatus("Supabase library did not load.", true);
+      setAuthStatus("Supabase library did not load. Check the CDN script tag.", true);
       return null;
     }
 
-    const config = window.MAPPIT_AUTH || {};
+    const config = getConfig();
 
-    return window.supabase.createClient(
-      config.supabaseUrl,
-      config.supabaseAnonKey,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
-        }
+    if (!config.supabaseUrl || !config.supabaseAnonKey) {
+      setAuthStatus("Missing Supabase URL or anon key.", true);
+      return null;
+    }
+
+    return window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
       }
-    );
+    });
   }
 
   async function checkActiveSession(supabaseClient) {
@@ -62,18 +76,26 @@
 
   function initAuth() {
     const supabaseClient = createSupabaseClient();
+    const googleButton = document.getElementById("googleLoginBtn");
+    const githubButton = document.getElementById("githubLoginBtn");
 
-    if (!supabaseClient) return;
+    if (!googleButton || !githubButton) {
+      setAuthStatus("Login buttons were not found on the page.", true);
+      return;
+    }
 
-    document
-      .getElementById("googleLoginBtn")
-      .addEventListener("click", () => signInWithProvider(supabaseClient, "google"));
+    if (!supabaseClient) {
+      googleButton.disabled = true;
+      githubButton.disabled = true;
+      return;
+    }
 
-    document
-      .getElementById("githubLoginBtn")
-      .addEventListener("click", () => signInWithProvider(supabaseClient, "github"));
+    googleButton.addEventListener("click", () => signInWithProvider(supabaseClient, "google"));
+    githubButton.addEventListener("click", () => signInWithProvider(supabaseClient, "github"));
 
-    checkActiveSession(supabaseClient);
+    checkActiveSession(supabaseClient).catch((error) => {
+      setAuthStatus(error.message || "Could not check login session.", true);
+    });
   }
 
   if (document.readyState === "loading") {
