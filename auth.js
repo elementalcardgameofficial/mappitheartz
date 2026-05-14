@@ -1,59 +1,106 @@
-// auth.js — Mappit Heartz GitHub OAuth via Supabase
-// Reads config from auth-config.js (window.MAPPIT_AUTH)
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+(function () {
+  const fallbackConfig = {
+    supabaseUrl: "https://mxzwtwhirpnccerrijrb.supabase.co",
+    supabaseAnonKey: "sb_publishable_lra0O9LFM2hz-9ZIoEio8A_GH39JBya"
+  };
 
-const { supabaseUrl, supabaseAnonKey } = window.MAPPIT_AUTH;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  function getConfig() {
+    const config = window.MAPPIT_AUTH || {};
+    return {
+      supabaseUrl: config.supabaseUrl || fallbackConfig.supabaseUrl,
+      supabaseAnonKey: config.supabaseAnonKey || fallbackConfig.supabaseAnonKey
+    };
+  }
 
-// GitHub Login
-async function loginWithGitHub() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "github",
-    options: {
-      redirectTo: "https://mappithtml.netlify.app/index.html"
+  function setAuthStatus(message, isError = false) {
+    const authStatus = document.getElementById("authStatus");
+    if (!authStatus) return;
+    authStatus.textContent = message;
+    authStatus.className = isError ? "error" : "";
+  }
+
+  function getRedirectUrl() {
+    return new URL("login.html", window.location.href).href;
+  }
+
+  function createSupabaseClient() {
+    if (!window.supabase || !window.supabase.createClient) {
+      setAuthStatus("Supabase library did not load. Check the CDN script tag.", true);
+      return null;
     }
-  });
-  if (error) console.error("Login error:", error.message);
-}
 
-// Logout
-async function logout() {
-  const { error } = await supabase.auth.signOut();
-  if (error) console.error("Logout error:", error.message);
-  window.location.href = "/login.html";
-}
+    const config = getConfig();
 
-// Check session on page load
-async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    // User is logged in
-    const user = session.user;
-    const avatar = document.getElementById("user-avatar");
-    const username = document.getElementById("user-name");
-    const logoutBtn = document.getElementById("logout-btn");
-    const loginBtn = document.getElementById("login-btn");
-
-    if (avatar) avatar.src = user.user_metadata.avatar_url || "";
-    if (username) username.textContent = user.user_metadata.user_name || user.email;
-    if (logoutBtn) logoutBtn.style.display = "block";
-    if (loginBtn) loginBtn.style.display = "none";
-
-    // If on login page and already logged in → go to app
-    if (window.location.pathname.includes("login")) {
-      window.location.href = "/index.html";
+    if (!config.supabaseUrl || !config.supabaseAnonKey) {
+      setAuthStatus("Missing Supabase URL or anon key.", true);
+      return null;
     }
-  } else {
-    // Not logged in — if on index, send to login
-    if (!window.location.pathname.includes("login")) {
-      window.location.href = "/login.html";
+
+    return window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+  }
+
+  async function checkActiveSession(supabaseClient) {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      setAuthStatus(error.message, true);
+      return;
+    }
+
+    if (data.session) {
+      window.location.href = "index.html";
     }
   }
-}
 
-// Expose functions globally
-window.loginWithGitHub = loginWithGitHub;
-window.logout = logout;
+  async function signInWithProvider(supabaseClient, provider) {
+    setAuthStatus("Opening sign in...");
 
-// Run on load
-checkSession();
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: getRedirectUrl(),
+        scopes: provider === "github" ? "read:user user:email" : undefined
+      }
+    });
+
+    if (error) {
+      setAuthStatus(error.message, true);
+    }
+  }
+
+  function initAuth() {
+    const supabaseClient = createSupabaseClient();
+    const googleButton = document.getElementById("googleLoginBtn");
+    const githubButton = document.getElementById("githubLoginBtn");
+
+    if (!googleButton || !githubButton) {
+      setAuthStatus("Login buttons were not found on the page.", true);
+      return;
+    }
+
+    if (!supabaseClient) {
+      googleButton.disabled = true;
+      githubButton.disabled = true;
+      return;
+    }
+
+    googleButton.addEventListener("click", () => signInWithProvider(supabaseClient, "google"));
+    githubButton.addEventListener("click", () => signInWithProvider(supabaseClient, "github"));
+
+    checkActiveSession(supabaseClient).catch((error) => {
+      setAuthStatus(error.message || "Could not check login session.", true);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAuth);
+  } else {
+    initAuth();
+  }
+})();
